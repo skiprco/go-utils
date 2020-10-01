@@ -9,7 +9,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// NewGenericError creates a new generic error
+// NewGenericError creates a new generic error.
+// WARNING: This function returns a GenericError. Do not assign it to an interface of type error!
 func NewGenericError(code int, domain string, subDomain string, subDomainCode string, additionalMeta map[string]string) *GenericError {
 	// Build and return error
 	return &GenericError{
@@ -25,6 +26,7 @@ func NewGenericError(code int, domain string, subDomain string, subDomainCode st
 }
 
 // NewGenericFromMicroError converts a micro error to a generic error
+// WARNING: This function returns a GenericError. Do not assign it to an interface of type error!
 func NewGenericFromMicroError(err error) *GenericError {
 	// Parse settings
 	detailSeparator := "/"
