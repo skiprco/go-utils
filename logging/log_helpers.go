@@ -24,7 +24,7 @@ func LogHTTPRequestResponse(request *http.Request, response *http.Response, logL
 	statusCode := 0
 	if response != nil {
 		statusCode = response.StatusCode
-		dumpResponseByte, err := httputil.DumpResponse(response, false)
+		dumpResponseByte, err := httputil.DumpResponse(response, true)
 		if err != nil {
 			log.WithField("error", err).Error("Unable to dump HTTP response")
 			return errors.NewGenericError(500, "go_utils", "logging", "unable_to_dump_response", nil)
@@ -39,6 +39,13 @@ func LogHTTPRequestResponse(request *http.Request, response *http.Response, logL
 		"request":            string(dumpReq),
 		"response":           dumpResponse,
 		"response_http_code": statusCode,
+		"context": map[string]interface{}{ // GCP specific fields
+			"httpRequest": map[string]interface{}{
+				"method":             request.Method,
+				"url":                request.URL.String(),
+				"responseStatusCode": statusCode,
+			},
+		},
 	}).Log(logLevel, message)
 
 	// Logging successful
