@@ -1,0 +1,29 @@
+name: Test
+on:
+  push:
+    branches:
+      - development
+    tags:
+      - '*'
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Go
+      uses: actions/setup-go@v2-beta
+      with:
+        go-version: '~1.14.3' # The Go version to download (if necessary) and use.
+
+    - name: Setup env
+      shell: bash
+      run: |
+        echo "::set-env name=GOPATH::$(go env GOPATH)"
+        echo "::add-path::$(go env GOPATH)/bin"
+
+    - name: Run unit tests
+      run: |
+        go test ./...
