@@ -57,7 +57,7 @@ func Call(method string, rootURL string, path string, body interface{}, response
 	// Unmarshal response
 	err = json.Unmarshal(resBody, response)
 	if err != nil {
-		traceLog.WithField("error", genErr.GetDetailString()).Error("Failed to parse response body from JSON")
+		traceLog.WithField("error", err).Error("Failed to parse response body from JSON")
 		return nil, errors.NewGenericError(421, "go_utils", "common", "parse_response_body_failed", nil)
 	}
 
