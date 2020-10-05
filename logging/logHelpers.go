@@ -4,17 +4,22 @@ import (
 	"net/http"
 	"net/http/httputil"
 
+	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 	"github.com/skiprco/go-utils/errors"
 )
 
-// LogHTTPRequestResponse logs a HTTP request and response
-func LogHTTPRequestResponse(request *http.Request, response *http.Response, logLevel log.Level, message string) *errors.GenericError {
+// LogHTTPRequestResponse logs a HTTP request and response. Returns a trace ID to link follow-up logs.
+func LogHTTPRequestResponse(request *http.Request, response *http.Response, logLevel log.Level, message string) (string, *errors.GenericError) {
+	// Generate trace ID
+	traceID := uuid.New()
+	traceLog := log.WithField("trace_id", traceID)
+
 	// Dump request
 	dumpReq, err := httputil.DumpRequest(request, true)
 	if err != nil {
-		log.WithField("error", err).Error("Unable to dump HTTP request")
-		return errors.NewGenericError(500, "go_utils", "logging", "unable_to_dump_request", nil)
+		traceLog.WithField("error", err).Error("Unable to dump HTTP request")
+		return traceID, errors.NewGenericError(500, "go_utils", "logging", "unable_to_dump_request", nil)
 	}
 
 	// Response body is already consumed.
@@ -26,8 +31,8 @@ func LogHTTPRequestResponse(request *http.Request, response *http.Response, logL
 		statusCode = response.StatusCode
 		dumpResponseByte, err := httputil.DumpResponse(response, true)
 		if err != nil {
-			log.WithField("error", err).Error("Unable to dump HTTP response")
-			return errors.NewGenericError(500, "go_utils", "logging", "unable_to_dump_response", nil)
+			traceLog.WithField("error", err).Error("Unable to dump HTTP response")
+			return traceID, errors.NewGenericError(500, "go_utils", "logging", "unable_to_dump_response", nil)
 		}
 		dumpResponse = string(dumpResponseByte)
 	} else {
@@ -35,7 +40,7 @@ func LogHTTPRequestResponse(request *http.Request, response *http.Response, logL
 	}
 
 	// Log result
-	log.WithFields(log.Fields{
+	traceLog.WithFields(log.Fields{
 		"request":            string(dumpReq),
 		"response":           dumpResponse,
 		"response_http_code": statusCode,
@@ -49,5 +54,5 @@ func LogHTTPRequestResponse(request *http.Request, response *http.Response, logL
 	}).Log(logLevel, message)
 
 	// Logging successful
-	return nil
+	return traceID, nil
 }
