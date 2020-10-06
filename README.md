@@ -11,6 +11,30 @@ import (
 ```
 
 ### Errors
+```go
+// Create an error with metadata
+meta := map[string]string{
+    "provider": "go-utils",
+}
+genErr := errors.NewGenericError(500, "booking", "common", "marshal_request_body_failed", meta)
+
+// Create an error from a go-micro error
+genErr := errors.NewGenericFromMicroError(microError)
+```
+
+### HTTP
+```go
+// Call with JSON marshaling and parsing
+users := []User{...}
+response := CreateUserResponse{}
+query = map[string]string{"lang": "en"}
+headers = map[string]string{"Authorization": "Bearer ..."}
+genErr := http.Call("POST", "https://skipr.co", "users", users, CreateUserResponse, query, headers)
+
+// Call with raw body and response (bytes)
+file = []byte{...}
+httpResponse, genErr := http.CallRaw("POST", "https://skipr.co", "files", file, nil, nil)
+```
 
 ### Logging
 ```go
