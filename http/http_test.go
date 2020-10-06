@@ -54,6 +54,7 @@ func Test_Call_200(t *testing.T) {
 		case "/test":
 			assert.Equal(t, "TESTMETHOD", req.Method)
 			assert.Equal(t, "query-success", req.URL.Query().Get("test-query"))
+			assert.Equal(t, "application/json", req.Header.Get("Content-Type"))
 			assert.Equal(t, "header-success", req.Header.Get("X-TEST"))
 			fmt.Fprint(res, `{"Response": "response sample"}`)
 			return true
@@ -92,6 +93,7 @@ func Test_Call_400(t *testing.T) {
 	testFunc := func(t *testing.T, res http.ResponseWriter, req *http.Request) bool {
 		switch req.URL.Path {
 		case "/test":
+			assert.Equal(t, "application/json", req.Header.Get("Content-Type"))
 			res.WriteHeader(400)
 			return true
 		}

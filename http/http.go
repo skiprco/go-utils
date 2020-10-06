@@ -13,6 +13,12 @@ import (
 
 // Call marshals the body to JSON and sends a HTTP request. Response is parsed as JSON.
 func Call(method string, rootURL string, path string, body interface{}, response interface{}, query map[string]string, headers map[string]string) (*http.Response, *errors.GenericError) {
+	// Set Content-Type to JSON
+	if headers == nil {
+		headers = map[string]string{}
+	}
+	headers["Content-Type"] = "application/json"
+
 	// Setup default logging fields
 	defaultLog := log.WithFields(log.Fields{
 		"method":  method,
