@@ -6,7 +6,9 @@ Common utils for Golang
 ```go
 import (
     "github.com/skiprco/go-utils/errors"
+    "github.com/skiprco/go-utils/http"
     "github.com/skiprco/go-utils/logging"
+    "github.com/skiprco/go-utils/manifest"
 )
 ```
 
@@ -54,4 +56,13 @@ log.WithField("error", err).Error("Human readable message")
 req, res := ...
 logging.LogHTTPRequestResponse(req, res, log.WarnLevel, "Human readable warning message")
 logging.LogHTTPRequestResponse(req, res, log.ErrorLevel, "Human readable error message")
+```
+
+### Manifest
+```go
+// Load manifest file
+manifest, genErr := manifest.LoadManifest()
+if genErr != nil {
+    log.WithField("error", err.GetDetailString()).Panic("Failed to load manifest file")
+}
 ```
