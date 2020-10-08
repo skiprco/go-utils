@@ -63,6 +63,6 @@ logging.LogHTTPRequestResponse(req, res, log.ErrorLevel, "Human readable error m
 // Load manifest file
 manifest, genErr := manifest.LoadManifest()
 if genErr != nil {
-    log.WithField("error", err.GetDetailString()).Panic("Failed to load manifest file")
+    log.WithField("error", genErr.GetDetailString()).Panic("Failed to load manifest file")
 }
 ```
