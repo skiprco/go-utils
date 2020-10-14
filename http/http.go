@@ -46,7 +46,7 @@ func Call(method string, rootURL string, path string, body interface{}, response
 	res, genErr := sendRequest(req)
 	if genErr != nil {
 		defaultLog.WithField("error", genErr.GetDetailString()).Error("Failed to send request")
-		return nil, genErr
+		return res, genErr
 	}
 
 	// Debug logging
@@ -87,7 +87,7 @@ func CallRaw(method string, rootURL string, path string, body []byte, query map[
 			"headers": headers,
 			"error":   genErr.GetDetailString(),
 		}).Error("Failed to send HTTP request")
-		return nil, genErr
+		return res, genErr
 	}
 	// Return result
 	return res, nil
@@ -133,14 +133,9 @@ func sendRequest(req *http.Request) (*http.Response, *errors.GenericError) {
 	switch {
 	// API responded with an error
 	case res.StatusCode >= 300:
-		body, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			// Reading body failed
-			log.WithFields(log.Fields{
-				"error":    err,
-				"trace_id": traceID,
-			}).Error("Unable to read HTTP response body")
-			return nil, errors.NewGenericError(500, "go_utils", "common", "read_response_body_failed", nil)
+		body, genErr := duplicateAndReturnResponseBody(res, traceID)
+		if genErr != nil {
+			return nil, genErr
 		}
 
 		// Log and return error
@@ -148,10 +143,30 @@ func sendRequest(req *http.Request) (*http.Response, *errors.GenericError) {
 			"body":     string(body),
 			"trace_id": traceID,
 		}).Warn("HTTP response code is error")
-		return nil, errors.NewGenericError(res.StatusCode, "go_utils", "common", "response_code_is_error", nil)
+		return res, errors.NewGenericError(res.StatusCode, "go_utils", "common", "response_code_is_error", nil)
 
 	// API responded with 2xx Success
 	default:
 		return res, nil
 	}
+}
+
+// duplicateAndReturnResponseBody consumes the response body, replaces it with a new ReadCloser and returns the body
+func duplicateAndReturnResponseBody(res *http.Response, traceID string) ([]byte, *errors.GenericError) {
+	// Read response body
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		// Reading body failed
+		log.WithFields(log.Fields{
+			"error":    err,
+			"trace_id": traceID,
+		}).Error("Unable to read HTTP response body")
+		return nil, errors.NewGenericError(500, "go_utils", "common", "read_response_body_failed", nil)
+	}
+
+	// Replace body with new reader
+	res.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+
+	// Return body
+	return body, nil
 }

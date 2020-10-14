@@ -77,13 +77,13 @@ func Test_Call_200(t *testing.T) {
 	headers := map[string]string{"X-TEST": "header-success"}
 
 	// Call helper
-	resp, err := Call("TESTMETHOD", ts.URL, "/test", request, response, query, headers)
+	resp, genErr := Call("TESTMETHOD", ts.URL, "/test", request, response, query, headers)
 
 	// Assert results
 	expectedResponse := &responseSample{
 		Response: "response sample",
 	}
-	assert.Nil(t, err)
+	assert.Nil(t, genErr)
 	assert.NotNil(t, resp)
 	assert.Equal(t, expectedResponse, response)
 }
@@ -95,6 +95,7 @@ func Test_Call_400(t *testing.T) {
 		case "/test":
 			assert.Equal(t, "application/json", req.Header.Get("Content-Type"))
 			res.WriteHeader(400)
+			fmt.Fprint(res, "error_during_test")
 			return true
 		}
 
@@ -110,35 +111,37 @@ func Test_Call_400(t *testing.T) {
 	response := &responseSample{}
 
 	// Call helper
-	resp, err := Call("POST", ts.URL, "/test", nil, response, nil, nil)
+	resp, genErr := Call("POST", ts.URL, "/test", nil, response, nil, nil)
 
 	// Assert results
-	assert.Nil(t, resp)
+	body, err := ioutil.ReadAll(resp.Body)
+	assert.Nil(t, err)
+	assert.Equal(t, "error_during_test", string(body))
 	assert.Equal(t, &responseSample{}, response)
-	errors.AssertGenericError(t, err, 400, "response_code_is_error", nil)
+	errors.AssertGenericError(t, genErr, 400, "response_code_is_error", nil)
 }
 
 func Test_Call_MarshalRequestBodyFailed_Failure(t *testing.T) {
 	// Call helper
 	request := func() {}
 	response := &responseSample{}
-	resp, err := Call("POST", "https://skipr.co", "/test", request, response, nil, nil)
+	resp, genErr := Call("POST", "https://skipr.co", "/test", request, response, nil, nil)
 
 	// Assert results
 	assert.Nil(t, resp)
 	assert.Equal(t, &responseSample{}, response)
-	errors.AssertGenericError(t, err, 500, "marshal_request_body_failed", nil)
+	errors.AssertGenericError(t, genErr, 500, "marshal_request_body_failed", nil)
 }
 
 func Test_Call_SendRequestFailed_Failure(t *testing.T) {
 	// Call helper
 	response := &responseSample{}
-	resp, err := Call("POST", "invalid://skipr.co", "/test", nil, response, nil, nil)
+	resp, genErr := Call("POST", "invalid://skipr.co", "/test", nil, response, nil, nil)
 
 	// Assert results
 	assert.Nil(t, resp)
 	assert.Equal(t, &responseSample{}, response)
-	errors.AssertGenericError(t, err, 421, "send_http_request_failed", nil)
+	errors.AssertGenericError(t, genErr, 421, "send_http_request_failed", nil)
 }
 
 func Test_Call_ParseResponseBodyFailed_Failure(t *testing.T) {
@@ -160,12 +163,12 @@ func Test_Call_ParseResponseBodyFailed_Failure(t *testing.T) {
 
 	// Call helper
 	response := &responseSample{}
-	resp, err := Call("POST", ts.URL, "/test", nil, response, nil, nil)
+	resp, genErr := Call("POST", ts.URL, "/test", nil, response, nil, nil)
 
 	// Assert results
 	assert.Nil(t, resp)
 	assert.Equal(t, &responseSample{}, response)
-	errors.AssertGenericError(t, err, 421, "parse_response_body_failed", nil)
+	errors.AssertGenericError(t, genErr, 421, "parse_response_body_failed", nil)
 }
 
 // ########################################
@@ -199,10 +202,10 @@ func Test_CallRaw_200(t *testing.T) {
 	headers := map[string]string{"X-TEST": "header-success"}
 
 	// Call helper
-	resp, err := CallRaw("TESTMETHOD", ts.URL, "/test", request, query, headers)
+	resp, genErr := CallRaw("TESTMETHOD", ts.URL, "/test", request, query, headers)
 
 	// Assert results
-	assert.Nil(t, err)
+	assert.Nil(t, genErr)
 	assert.NotNil(t, resp)
 }
 
@@ -212,6 +215,7 @@ func Test_CallRaw_400(t *testing.T) {
 		switch req.URL.Path {
 		case "/test":
 			res.WriteHeader(400)
+			fmt.Fprint(res, "error_during_test")
 			return true
 		}
 
@@ -224,9 +228,11 @@ func Test_CallRaw_400(t *testing.T) {
 	defer ts.Close()
 
 	// Call helper
-	resp, err := CallRaw("GET", ts.URL, "/test", nil, nil, nil)
+	resp, genErr := CallRaw("GET", ts.URL, "/test", nil, nil, nil)
 
 	// Assert results
-	assert.Nil(t, resp)
-	errors.AssertGenericError(t, err, 400, "response_code_is_error", nil)
+	body, err := ioutil.ReadAll(resp.Body)
+	assert.Nil(t, err)
+	assert.Equal(t, "error_during_test", string(body))
+	errors.AssertGenericError(t, genErr, 400, "response_code_is_error", nil)
 }

@@ -36,6 +36,16 @@ genErr := http.Call("POST", "https://skipr.co", "users", users, CreateUserRespon
 // Call with raw body and response (bytes)
 file = []byte{...}
 httpResponse, genErr := http.CallRaw("POST", "https://skipr.co", "files", file, nil, nil)
+
+// In case the server returns an error code (>= 300), the http.Response is still returned.
+// This way, you can translate the body to a more specific error using below setup
+res, genErr := Call("POST", "https://skipr.co", "/test", request, response, nil, nil)
+if genErr != nil {
+    if genErr.SubDomainCode != "response_code_is_error" {
+        return nil, genErr
+    }
+    return nil, translateResponseToSpecificError(res)
+}
 ```
 
 ### Logging
