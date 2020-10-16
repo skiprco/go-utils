@@ -56,6 +56,8 @@ type TraceOnErrorHook struct {
 func (h *TraceOnErrorHook) Levels() []log.Level {
 	return []log.Level{
 		log.ErrorLevel,
+		log.FatalLevel,
+		log.PanicLevel,
 	}
 }
 
