@@ -1,11 +1,12 @@
 package logging
 
 import (
-	"bytes"
+	"io/ioutil"
 	"os"
 	"runtime/debug"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus/hooks/writer"
 )
 
 // SetupLogger configures the standard logger of Logrus
@@ -20,24 +21,30 @@ func SetupLogger(serviceName string) {
 		},
 	})
 
-	// set output to stderr or stdout
-	log.SetOutput(&OutputSplitter{})
+	// Add error hook to format log for error reporting
+	log.AddHook(&TraceOnErrorHook{service: serviceName})
+
+	// Split output between stderr and stdout
+	log.SetOutput(ioutil.Discard) // Send all logs to nowhere by default
+	log.AddHook(&writer.Hook{     // Send logs with level higher than error to stderr
+		Writer: os.Stderr,
+		LogLevels: []log.Level{
+			log.PanicLevel,
+			log.FatalLevel,
+			log.ErrorLevel,
+		},
+	})
+	log.AddHook(&writer.Hook{ // Send warning and lower logs to stdout
+		Writer: os.Stdout,
+		LogLevels: []log.Level{
+			log.WarnLevel,
+			log.InfoLevel,
+			log.DebugLevel,
+		},
+	})
 
 	// Only log the info severity or above
 	log.SetLevel(log.InfoLevel)
-
-	// add error hook to format log for error reporting
-	log.AddHook(&TraceOnErrorHook{service: serviceName})
-}
-
-// OutputSplitter routes log output to stdout or stderr based on the level
-type OutputSplitter struct{}
-
-func (splitter *OutputSplitter) Write(p []byte) (n int, err error) {
-	if bytes.Contains(p, []byte(`"severity":"error"`)) {
-		return os.Stderr.Write(p)
-	}
-	return os.Stdout.Write(p)
 }
 
 // TraceOnErrorHook will add a stack trace when a error is logged
@@ -49,6 +56,8 @@ type TraceOnErrorHook struct {
 func (h *TraceOnErrorHook) Levels() []log.Level {
 	return []log.Level{
 		log.ErrorLevel,
+		log.FatalLevel,
+		log.PanicLevel,
 	}
 }
 
