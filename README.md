@@ -12,6 +12,27 @@ import (
 )
 ```
 
+### Converters
+
+#### Country code
+```go
+// Fetch map country code to country name
+cc := converters.CountryCodes()
+name := cc["BE"] // name = "Belgium", nil if not found
+
+// Convert country code to country name
+name, genErr := converters.CountryCodeToCountryName("BE") // name == "Belgium", genErr.Code is 404 when not found
+
+// Convert a country's name to a country's code, ignoring casing and accents
+code, genErr = CountryNameToCountryCode("CURAÇAO") // code == "CW", genErr.Code is 404 when not found
+```
+
+#### Strings
+```go
+// Removes all the accents from the letters in the string, but keeps casing
+normalised, genErr := NormaliseString("Tëst Çôdé (test-result)") // normalised == "Test Code (test-result)"
+```
+
 ### Errors
 ```go
 // Create an error with metadata
@@ -75,4 +96,12 @@ manifest, genErr := manifest.LoadManifest()
 if genErr != nil {
     log.WithField("error", genErr.GetDetailString()).Panic("Failed to load manifest file")
 }
+```
+
+### Validation
+
+#### Country code
+```go
+// Checks if a country code is valid. An empty code is considered valid as well.
+valid := ValidateCountryCode("BE") // valid == true
 ```
