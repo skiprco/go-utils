@@ -4,8 +4,9 @@ package logging
 
 import (
 	"context"
+	"strings"
 
-	microMetadata "github.com/micro/go-micro/v2/metadata"
+	"github.com/micro/go-micro/v2/metadata"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -48,12 +49,13 @@ func logEvent(ctx context.Context, message string, category auditCategory, addit
 
 	// Read metadata from context
 	var logFields map[string]interface{}
-	metadata, success := microMetadata.FromContext(ctx)
-	if success && metadata != nil {
-		maxLength := len(metadata) + len(additionalData) + 2 // for message and category
+	meta, success := metadata.FromContext(ctx)
+	if success && meta != nil {
+		maxLength := len(meta) + len(additionalData) + 2 // for message and category
 		logFields = make(log.Fields, maxLength)
-		for key, value := range metadata {
-			logFields[key] = value
+		for key, value := range meta {
+			lowerKey := strings.ToLower(key)
+			logFields[lowerKey] = value
 		}
 	} else {
 		maxLength := len(additionalData) + 2 // for message and category
