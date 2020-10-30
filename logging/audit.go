@@ -13,28 +13,29 @@ import (
 type auditCategory string
 
 const (
+	auditCategoryFact auditCategory = "fact"
+
 	auditCategoryAttempt auditCategory = "attempt"
-	auditCategoryFact    auditCategory = "fact"
 	auditCategorySuccess auditCategory = "success"
 	auditCategoryFail    auditCategory = "fail"
 )
-
-// AuditAttempt logs an audit message in the "attempt" category
-func AuditAttempt(ctx context.Context, message string, additionalData map[string]interface{}) {
-	logEvent(ctx, message, auditCategoryAttempt, additionalData)
-}
 
 // AuditFact logs an audit message in the "fact" category
 func AuditFact(ctx context.Context, message string, additionalData map[string]interface{}) {
 	logEvent(ctx, message, auditCategoryFact, additionalData)
 }
 
-// AuditSuccess logs an audit message in the "success" category
+// AuditAttempt logs an audit message in the "attempt" category
+func AuditAttempt(ctx context.Context, message string, additionalData map[string]interface{}) {
+	logEvent(ctx, message, auditCategoryAttempt, additionalData)
+}
+
+// AuditSuccess logs a successful result to a previous audit message of category "attempt"
 func AuditSuccess(ctx context.Context, message string, additionalData map[string]interface{}) {
 	logEvent(ctx, message, auditCategorySuccess, additionalData)
 }
 
-// AuditFail logs an audit message in the "fail" category
+// AuditFail logs a failure result to a previous audit message of category "attempt"
 func AuditFail(ctx context.Context, message string, additionalData map[string]interface{}) {
 	logEvent(ctx, message, auditCategoryFail, additionalData)
 }
