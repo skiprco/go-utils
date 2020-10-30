@@ -13,7 +13,7 @@ import (
 // NewGenericError creates a new generic error.
 // WARNING: This function returns a GenericError. Do not assign it to an interface of type error!
 func NewGenericError(code int, domain string, subDomain string, subDomainCode string, additionalMeta map[string]string) *GenericError {
-	// Build basic error
+	// Build and return error
 	return &GenericError{
 		ID:            time.Now().UTC().Format(time.RFC3339),
 		Code:          code,
