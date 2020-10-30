@@ -7,12 +7,13 @@ import (
 
 	microErrors "github.com/micro/go-micro/v2/errors"
 	log "github.com/sirupsen/logrus"
+	"github.com/skiprco/go-utils/collections"
 )
 
 // NewGenericError creates a new generic error.
 // WARNING: This function returns a GenericError. Do not assign it to an interface of type error!
 func NewGenericError(code int, domain string, subDomain string, subDomainCode string, additionalMeta map[string]string) *GenericError {
-	// Build and return error
+	// Build basic error
 	return &GenericError{
 		ID:            time.Now().UTC().Format(time.RFC3339),
 		Code:          code,
@@ -20,7 +21,7 @@ func NewGenericError(code int, domain string, subDomain string, subDomainCode st
 		Domain:        domain,
 		SubDomain:     subDomain,
 		SubDomainCode: subDomainCode,
-		Meta:          mergeMeta(defaultMeta, additionalMeta),
+		Meta:          collections.StringMapMerge(defaultMeta, additionalMeta),
 		IsLegacyError: false,
 	}
 }

@@ -5,11 +5,31 @@ Common utils for Golang
 ### Import
 ```go
 import (
+    "github.com/skiprco/go-utils/collections"
+    "github.com/skiprco/go-utils/converters"
     "github.com/skiprco/go-utils/errors"
     "github.com/skiprco/go-utils/http"
     "github.com/skiprco/go-utils/logging"
     "github.com/skiprco/go-utils/manifest"
+    "github.com/skiprco/go-utils/validation"
 )
+```
+
+### Collections
+
+#### String Map: map[string]string
+```go
+// StringMapMerge: Merge 2 maps into a copy
+base := map[string]string{"k1": "b1", "k2": "b2"}
+additional := map[string]string{"k2": "a2", "k3": "a3"}
+result := collections.StringMapMerge(base, additional) // == map[string]string{"k1": "b1", "k2": "a2", "k3": "a3"}
+```
+
+#### String Slice: []string
+```go
+// StringSliceContains: Check if the slice contains a value
+slice := []string{"test1", "test2"}
+result := collections.StringSliceContains(slice, "test1") // == true
 ```
 
 ### Converters

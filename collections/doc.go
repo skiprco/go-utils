@@ -1,0 +1,3 @@
+// Package collections contains helpers to work with collections like maps, slices, ...
+// This package is split from converters to prevent cyclic imports.
+package collections

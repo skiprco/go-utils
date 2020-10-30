@@ -1,4 +1,4 @@
-package errors
+package collections
 
 import (
 	"testing"
@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_mergeMeta_AdditionalNil(t *testing.T) {
+func Test_StringMapMerge_AdditionalNil(t *testing.T) {
 	// Setup test data
 	base := map[string]string{
 		"test1": "success1",
@@ -14,7 +14,7 @@ func Test_mergeMeta_AdditionalNil(t *testing.T) {
 	}
 
 	// Call function
-	result := mergeMeta(base, nil)
+	result := StringMapMerge(base, nil)
 
 	// Assert result
 	assert.NotSame(t, result, base)
@@ -25,7 +25,7 @@ func Test_mergeMeta_AdditionalNil(t *testing.T) {
 	assert.Equal(t, expected, result)
 }
 
-func Test_mergeMeta_AdditionalSet(t *testing.T) {
+func Test_StringMapMerge_AdditionalSet(t *testing.T) {
 	// Setup test data
 	base := map[string]string{
 		"test1": "success1",
@@ -38,7 +38,7 @@ func Test_mergeMeta_AdditionalSet(t *testing.T) {
 	}
 
 	// Call function
-	result := mergeMeta(base, addition)
+	result := StringMapMerge(base, addition)
 
 	// Assert result
 	assert.NotSame(t, result, base)
