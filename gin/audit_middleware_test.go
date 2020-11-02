@@ -1,4 +1,4 @@
-package logging
+package gin
 
 import (
 	"bytes"
@@ -13,6 +13,7 @@ import (
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 	logTest "github.com/sirupsen/logrus/hooks/test"
+	"github.com/skiprco/go-utils/logging"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -33,16 +34,16 @@ func Test_AuditMiddleware_OperationSuccess(t *testing.T) {
 	actualAttempt := testAssertAndDropDynamicEntryFields(t, hook.Entries[0])
 	expected := log.Fields{
 		"operator":        "test-operator",
-		"category":        auditCategoryAttempt,
-		"message":         auditMessageOperationAttempt,
+		"category":        logging.AuditCategoryAttempt,
+		"message":         logging.AuditMessageOperationAttempt,
 		"request_payload": fixtureBody,
 	}
 	assert.Equal(t, expected, actualAttempt)
 
 	// Assert operation success
 	actualResult := testAssertAndDropDynamicEntryFields(t, hook.Entries[1])
-	expected["category"] = auditCategorySuccess
-	expected["message"] = auditMessageOperationSuccess
+	expected["category"] = logging.AuditCategorySuccess
+	expected["message"] = logging.AuditMessageOperationSuccess
 	expected["response_payload"] = "test-response-body"
 	assert.Equal(t, expected, actualResult)
 
@@ -64,16 +65,16 @@ func Test_AuditMiddleware_OperationFail(t *testing.T) {
 	actualAttempt := testAssertAndDropDynamicEntryFields(t, hook.Entries[0])
 	expected := log.Fields{
 		"operator":        "test-operator",
-		"category":        auditCategoryAttempt,
-		"message":         auditMessageOperationAttempt,
+		"category":        logging.AuditCategoryAttempt,
+		"message":         logging.AuditMessageOperationAttempt,
 		"request_payload": fixtureBody,
 	}
 	assert.Equal(t, expected, actualAttempt)
 
 	// Assert operation fail
 	actualResult := testAssertAndDropDynamicEntryFields(t, hook.Entries[1])
-	expected["category"] = auditCategoryFail
-	expected["message"] = auditMessageOperationFail
+	expected["category"] = logging.AuditCategoryFail
+	expected["message"] = logging.AuditMessageOperationFail
 	expected["response_payload"] = "test-response-body"
 	assert.Equal(t, expected, actualResult)
 

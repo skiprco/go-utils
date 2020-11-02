@@ -8,6 +8,7 @@ import (
     "github.com/skiprco/go-utils/collections"
     "github.com/skiprco/go-utils/converters"
     "github.com/skiprco/go-utils/errors"
+    "github.com/skiprco/go-utils/gin"
     "github.com/skiprco/go-utils/http"
     "github.com/skiprco/go-utils/logging"
     "github.com/skiprco/go-utils/manifest"
@@ -65,6 +66,14 @@ genErr := errors.NewGenericError(500, "booking", "common", "marshal_request_body
 genErr := errors.NewGenericFromMicroError(microError)
 ```
 
+### Gin
+```go
+// Global audit middleware for Gin
+// - Logs each request and response
+// - Injects metadata into the context to support audit logging in other services
+router.Use(gin.AuditMiddleware("booking-api"))
+```
+
 ### HTTP
 ```go
 // Call with JSON marshaling and parsing
@@ -107,6 +116,15 @@ log.WithField("error", err).Error("Human readable message")
 req, res := ...
 logging.LogHTTPRequestResponse(req, res, log.WarnLevel, "Human readable warning message")
 logging.LogHTTPRequestResponse(req, res, log.ErrorLevel, "Human readable error message")
+
+// Create a new audit log entry
+additionalData := map[string]interface{} {
+    "reason": "example reason",
+}
+logging.AuditFact(ctx, "user_update_skipped", additionalData)
+logging.AuditAttempt(ctx, "update_user", nil)
+logging.AuditSuccess(ctx, "update_user", nil)
+logging.AuditFail(ctx, "update_user", nil)
 ```
 
 ### Manifest

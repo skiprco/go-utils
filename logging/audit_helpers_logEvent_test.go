@@ -29,12 +29,12 @@ func Test_logEvent_WithContextAndAdditionalData_Success(t *testing.T) {
 	}
 
 	// Call helper
-	logEvent(ctx, "test-message", auditCategorySuccess, additional)
+	logEvent(ctx, "test-message", AuditCategorySuccess, additional)
 
 	// Assert result
 	require.Len(t, hook.Entries, 1)
 	expectedData := log.Fields{
-		"category":               auditCategorySuccess,
+		"category":               AuditCategorySuccess,
 		"message":                "test-message",
 		"test-additional-string": "test-additional-value",
 		"test-additional-int":    123,
@@ -49,12 +49,12 @@ func Test_logEvent_Minimal_Success(t *testing.T) {
 	hook := logTest.NewGlobal()
 
 	// Call helper
-	logEvent(context.Background(), "test-message", auditCategorySuccess, nil)
+	logEvent(context.Background(), "test-message", AuditCategorySuccess, nil)
 
 	// Assert result
 	require.Len(t, hook.Entries, 1)
 	expectedData := log.Fields{
-		"category": auditCategorySuccess,
+		"category": AuditCategorySuccess,
 		"message":  "test-message",
 	}
 	assert.Equal(t, expectedData, hook.LastEntry().Data)

@@ -20,17 +20,17 @@ import (
 type auditCategory string
 
 const (
-	auditCategoryFact auditCategory = "fact"
+	AuditCategoryFact auditCategory = "fact"
 
-	auditCategoryAttempt auditCategory = "attempt"
-	auditCategorySuccess auditCategory = "success"
-	auditCategoryFail    auditCategory = "fail"
+	AuditCategoryAttempt auditCategory = "attempt"
+	AuditCategorySuccess auditCategory = "success"
+	AuditCategoryFail    auditCategory = "fail"
 )
 
 const (
-	auditMessageOperationAttempt string = "operation_attempt"
-	auditMessageOperationSuccess string = "operation_success"
-	auditMessageOperationFail    string = "operation_fail"
+	AuditMessageOperationAttempt string = "operation_attempt"
+	AuditMessageOperationSuccess string = "operation_success"
+	AuditMessageOperationFail    string = "operation_fail"
 )
 
 // ========================================
@@ -40,19 +40,19 @@ const (
 // AuditOperationAttempt logs an audit message in the "attempt" category for an operation.
 // This call should be used at the start of an operation.
 func AuditOperationAttempt(ctx context.Context, additionalData map[string]interface{}) {
-	AuditAttempt(ctx, auditMessageOperationAttempt, additionalData)
+	AuditAttempt(ctx, AuditMessageOperationAttempt, additionalData)
 }
 
 // AuditOperationSuccess logs a successful result for a previous call to AuditOperationAttempt.
 // This call should be used at the end of an operation.
 func AuditOperationSuccess(ctx context.Context, additionalData map[string]interface{}) {
-	AuditSuccess(ctx, auditMessageOperationSuccess, additionalData)
+	AuditSuccess(ctx, AuditMessageOperationSuccess, additionalData)
 }
 
 // AuditOperationFail logs a failure result for a previous call to AuditOperationAttempt
 // This call should be used at the end of an operation.
 func AuditOperationFail(ctx context.Context, additionalData map[string]interface{}) {
-	AuditFail(ctx, auditMessageOperationFail, additionalData)
+	AuditFail(ctx, AuditMessageOperationFail, additionalData)
 }
 
 // ========================================
@@ -61,22 +61,22 @@ func AuditOperationFail(ctx context.Context, additionalData map[string]interface
 
 // AuditFact logs an audit message in the "fact" category
 func AuditFact(ctx context.Context, message string, additionalData map[string]interface{}) {
-	logEvent(ctx, message, auditCategoryFact, additionalData)
+	logEvent(ctx, message, AuditCategoryFact, additionalData)
 }
 
 // AuditAttempt logs an audit message in the "attempt" category
 func AuditAttempt(ctx context.Context, attemptName string, additionalData map[string]interface{}) {
-	logEvent(ctx, attemptName, auditCategoryAttempt, additionalData)
+	logEvent(ctx, attemptName, AuditCategoryAttempt, additionalData)
 }
 
 // AuditSuccess logs a successful result to a previous audit message of category "attempt"
 func AuditSuccess(ctx context.Context, attemptName string, additionalData map[string]interface{}) {
-	logEvent(ctx, attemptName, auditCategorySuccess, additionalData)
+	logEvent(ctx, attemptName, AuditCategorySuccess, additionalData)
 }
 
 // AuditFail logs a failure result to a previous audit message of category "attempt"
 func AuditFail(ctx context.Context, attemptName string, additionalData map[string]interface{}) {
-	logEvent(ctx, attemptName, auditCategoryFail, additionalData)
+	logEvent(ctx, attemptName, AuditCategoryFail, additionalData)
 }
 
 // ========================================
