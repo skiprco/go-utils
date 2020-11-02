@@ -27,6 +27,12 @@ const (
 	auditCategoryFail    auditCategory = "fail"
 )
 
+const (
+	auditMessageOperationAttempt string = "operation_attempt"
+	auditMessageOperationSuccess string = "operation_success"
+	auditMessageOperationFail    string = "operation_fail"
+)
+
 // ========================================
 // =         START / END OPERATION        =
 // ========================================
@@ -34,19 +40,19 @@ const (
 // AuditOperationAttempt logs an audit message in the "attempt" category for an operation.
 // This call should be used at the start of an operation.
 func AuditOperationAttempt(ctx context.Context, additionalData map[string]interface{}) {
-	AuditAttempt(ctx, "operation_attempt", additionalData)
+	AuditAttempt(ctx, auditMessageOperationAttempt, additionalData)
 }
 
 // AuditOperationSuccess logs a successful result for a previous call to AuditOperationAttempt.
 // This call should be used at the end of an operation.
 func AuditOperationSuccess(ctx context.Context, additionalData map[string]interface{}) {
-	AuditSuccess(ctx, "operation_success", additionalData)
+	AuditSuccess(ctx, auditMessageOperationSuccess, additionalData)
 }
 
 // AuditOperationFail logs a failure result for a previous call to AuditOperationAttempt
 // This call should be used at the end of an operation.
 func AuditOperationFail(ctx context.Context, additionalData map[string]interface{}) {
-	AuditFail(ctx, "operation_fail", additionalData)
+	AuditFail(ctx, auditMessageOperationFail, additionalData)
 }
 
 // ========================================

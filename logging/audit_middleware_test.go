@@ -66,14 +66,14 @@ func Test_AuditMiddleware_OperationSuccess(t *testing.T) {
 	expected := log.Fields{
 		"operator": "test-operator",
 		"category": auditCategoryAttempt,
-		"message":  "operation_attempt",
+		"message":  auditMessageOperationAttempt,
 	}
 	assert.Equal(t, expected, actualAttempt)
 
 	// Assert operation success
 	actualResult := testAssertAndDropDynamicEntryFields(t, hook.Entries[1])
 	expected["category"] = auditCategorySuccess
-	expected["message"] = "operation_success"
+	expected["message"] = auditMessageOperationSuccess
 	assert.Equal(t, expected, actualResult)
 
 	// Assert combined
@@ -97,14 +97,14 @@ func Test_AuditMiddleware_OperationFail(t *testing.T) {
 	expected := log.Fields{
 		"operator": "test-operator",
 		"category": auditCategoryAttempt,
-		"message":  "operation_attempt",
+		"message":  auditMessageOperationAttempt,
 	}
 	assert.Equal(t, expected, actualAttempt)
 
 	// Assert operation fail
 	actualResult := testAssertAndDropDynamicEntryFields(t, hook.Entries[1])
 	expected["category"] = auditCategoryFail
-	expected["message"] = "operation_fail"
+	expected["message"] = auditMessageOperationFail
 	assert.Equal(t, expected, actualResult)
 
 	// Assert combined
