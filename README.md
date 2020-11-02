@@ -8,6 +8,7 @@ import (
     "github.com/skiprco/go-utils/collections"
     "github.com/skiprco/go-utils/converters"
     "github.com/skiprco/go-utils/errors"
+    "github.com/skiprco/go-utils/gin"
     "github.com/skiprco/go-utils/http"
     "github.com/skiprco/go-utils/logging"
     "github.com/skiprco/go-utils/manifest"
