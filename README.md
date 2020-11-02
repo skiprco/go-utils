@@ -72,6 +72,17 @@ genErr := errors.NewGenericFromMicroError(microError)
 // - Logs each request and response
 // - Injects metadata into the context to support audit logging in other services
 router.Use(gin.AuditMiddleware("booking-api"))
+
+// Fetch current metadata from Gin context
+meta := GetMetadata(c)
+
+// Update metadata in Gin context
+additionalMeta := map[string]string{ ... }
+updatedMeta := UpdateMetadata(c, additionalMeta)
+
+// Fetch context with metadata from Gin context
+ctx := GetContextWithMetadata(c)
+response, err := or.OrganisationClient.CreateOrganisationFromVAT(ctx, request)
 ```
 
 ### HTTP
