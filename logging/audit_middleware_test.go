@@ -1,6 +1,9 @@
 package logging
 
 import (
+	"bytes"
+	"io/ioutil"
+	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"testing"
@@ -14,11 +17,99 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func fixtureRequest() (*httptest.ResponseRecorder, *gin.Context) {
-	rec := httptest.NewRecorder()
-	ctx, _ := gin.CreateTestContext(rec)
-	ctx.Request = httptest.NewRequest("GET", "/", nil)
-	return rec, ctx
+// ========================================
+// =                 TESTS                =
+// ========================================
+
+func Test_AuditMiddleware_OperationSuccess(t *testing.T) {
+	// Setup test
+	hook := logTest.NewGlobal()
+	router := fixtureRouter(200, 10*time.Millisecond)
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, fixtureRequest())
+
+	// Assert operation attempt
+	require.Len(t, hook.Entries, 2)
+	actualAttempt := testAssertAndDropDynamicEntryFields(t, hook.Entries[0])
+	expected := log.Fields{
+		"operator":        "test-operator",
+		"category":        auditCategoryAttempt,
+		"message":         auditMessageOperationAttempt,
+		"request_payload": fixtureBody,
+	}
+	assert.Equal(t, expected, actualAttempt)
+
+	// Assert operation success
+	actualResult := testAssertAndDropDynamicEntryFields(t, hook.Entries[1])
+	expected["category"] = auditCategorySuccess
+	expected["message"] = auditMessageOperationSuccess
+	expected["response_payload"] = "test-response-body"
+	assert.Equal(t, expected, actualResult)
+
+	// Assert combined
+	assert.Equal(t, hook.Entries[0].Data["operation_start_datetime"], hook.Entries[1].Data["operation_start_datetime"])
+	assert.NotEqual(t, hook.Entries[0].Data["operation_time"], hook.Entries[1].Data["operation_time"])
+	hook.Reset()
+}
+
+func Test_AuditMiddleware_OperationFail(t *testing.T) {
+	// Setup test
+	hook := logTest.NewGlobal()
+	router := fixtureRouter(400, 0)
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, fixtureRequest())
+
+	// Assert operation attempt
+	require.Len(t, hook.Entries, 2)
+	actualAttempt := testAssertAndDropDynamicEntryFields(t, hook.Entries[0])
+	expected := log.Fields{
+		"operator":        "test-operator",
+		"category":        auditCategoryAttempt,
+		"message":         auditMessageOperationAttempt,
+		"request_payload": fixtureBody,
+	}
+	assert.Equal(t, expected, actualAttempt)
+
+	// Assert operation fail
+	actualResult := testAssertAndDropDynamicEntryFields(t, hook.Entries[1])
+	expected["category"] = auditCategoryFail
+	expected["message"] = auditMessageOperationFail
+	expected["response_payload"] = "test-response-body"
+	assert.Equal(t, expected, actualResult)
+
+	// Assert combined
+	assert.Equal(t, hook.Entries[0].Data["operation_start_datetime"], hook.Entries[1].Data["operation_start_datetime"])
+	hook.Reset()
+}
+
+// ========================================
+// =                HELPERS               =
+// ========================================
+
+const fixtureBody = `{"test-key": "test-value"}`
+
+func fixtureRequest() *http.Request {
+	bodyReader := ioutil.NopCloser(bytes.NewBufferString(fixtureBody))
+	return httptest.NewRequest("POST", "/", bodyReader)
+}
+
+func fixtureRouter(status int, duration time.Duration) *gin.Engine {
+	// Create router
+	router := gin.Default()
+
+	// Set audit middleware
+	auditMW := AuditMiddleware("test-operator")
+	router.Use(auditMW)
+
+	// Add simple handler
+	handler := func(c *gin.Context) {
+		time.Sleep(duration) // Some processing
+		c.String(status, "test-response-body")
+	}
+	router.POST("/", handler)
+
+	// Return engine
+	return router
 }
 
 func testAssertAndDropDynamicEntryFields(t *testing.T, entry log.Entry) log.Fields {
@@ -49,65 +140,4 @@ func testAssertAndDropDynamicEntryFields(t *testing.T, entry log.Entry) log.Fiel
 
 	// Return remaining fields
 	return fields
-}
-
-func Test_AuditMiddleware_OperationSuccess(t *testing.T) {
-	// Setup test
-	hook := logTest.NewGlobal()
-	_, ctx := fixtureRequest()
-
-	// Call middleware
-	mw := AuditMiddleware("test-operator")
-	mw(ctx)
-
-	// Assert operation attempt
-	require.Len(t, hook.Entries, 2)
-	actualAttempt := testAssertAndDropDynamicEntryFields(t, hook.Entries[0])
-	expected := log.Fields{
-		"operator": "test-operator",
-		"category": auditCategoryAttempt,
-		"message":  auditMessageOperationAttempt,
-	}
-	assert.Equal(t, expected, actualAttempt)
-
-	// Assert operation success
-	actualResult := testAssertAndDropDynamicEntryFields(t, hook.Entries[1])
-	expected["category"] = auditCategorySuccess
-	expected["message"] = auditMessageOperationSuccess
-	assert.Equal(t, expected, actualResult)
-
-	// Assert combined
-	assert.Equal(t, hook.Entries[0].Data["operation_start_datetime"], hook.Entries[1].Data["operation_start_datetime"])
-	hook.Reset()
-}
-
-func Test_AuditMiddleware_OperationFail(t *testing.T) {
-	// Setup test
-	hook := logTest.NewGlobal()
-	_, ctx := fixtureRequest()
-
-	// Call middleware
-	mw := AuditMiddleware("test-operator")
-	ctx.Status(400)
-	mw(ctx)
-
-	// Assert operation attempt
-	require.Len(t, hook.Entries, 2)
-	actualAttempt := testAssertAndDropDynamicEntryFields(t, hook.Entries[0])
-	expected := log.Fields{
-		"operator": "test-operator",
-		"category": auditCategoryAttempt,
-		"message":  auditMessageOperationAttempt,
-	}
-	assert.Equal(t, expected, actualAttempt)
-
-	// Assert operation fail
-	actualResult := testAssertAndDropDynamicEntryFields(t, hook.Entries[1])
-	expected["category"] = auditCategoryFail
-	expected["message"] = auditMessageOperationFail
-	assert.Equal(t, expected, actualResult)
-
-	// Assert combined
-	assert.Equal(t, hook.Entries[0].Data["operation_start_datetime"], hook.Entries[1].Data["operation_start_datetime"])
-	hook.Reset()
 }

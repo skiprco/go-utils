@@ -1,7 +1,9 @@
 package logging
 
 import (
+	"bytes"
 	"context"
+	"io/ioutil"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -18,6 +20,17 @@ import (
 // - operator: e.g. booking-api, registration-api, ...
 func AuditMiddleware(operator string) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// Read request body
+		var bodyBytes []byte
+		if c.Request.Body != nil {
+			bodyBytes, _ = ioutil.ReadAll(c.Request.Body)
+		}
+		c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+
+		// Replace writer with bodyLogWriter to capture response body
+		blw := &bodyLogWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
+		c.Writer = blw
+
 		// Build audit data
 		auditData := map[string]string{
 			"operator":                 operator,
@@ -27,23 +40,29 @@ func AuditMiddleware(operator string) gin.HandlerFunc {
 		}
 
 		// Update metadataToPass
-		metadata := c.GetStringMapString("metadataToPass")
-		metadata = collections.StringMapMerge(metadata, auditData)
-		c.Set("metadataToPass", metadata)
+		meta := c.GetStringMapString("metadataToPass")
+		meta = collections.StringMapMerge(meta, auditData)
+		c.Set("metadataToPass", meta)
 
 		// Log operation attempt
 		ctx := getContextFromGin(c)
-		AuditOperationAttempt(ctx, nil)
+		additional := map[string]interface{}{ // This data shouldn't be included in the context
+			"request_payload": string(bodyBytes),
+		}
+		AuditOperationAttempt(ctx, additional)
 
 		// Process api call
 		c.Next()
 
+		// Read response body
+		additional["response_payload"] = blw.body.String()
+
 		// Log operation result
 		ctx = getContextFromGin(c)
 		if c.Writer.Status() < 300 {
-			AuditOperationSuccess(ctx, nil)
+			AuditOperationSuccess(ctx, additional)
 		} else {
-			AuditOperationFail(ctx, nil)
+			AuditOperationFail(ctx, additional)
 		}
 	}
 }
@@ -60,4 +79,19 @@ func getContextFromGin(c *gin.Context) context.Context {
 
 	// Return result
 	return ctx
+}
+
+type bodyLogWriter struct {
+	gin.ResponseWriter
+	body *bytes.Buffer
+}
+
+func (w bodyLogWriter) Write(data []byte) (int, error) {
+	w.body.Write(data)
+	return w.ResponseWriter.Write(data)
+}
+
+func (w bodyLogWriter) WriteString(s string) (int, error) {
+	w.body.Write([]byte(s))
+	return w.ResponseWriter.WriteString(s)
 }
