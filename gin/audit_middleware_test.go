@@ -35,17 +35,17 @@ func Test_AuditMiddleware_OperationSuccess(t *testing.T) {
 	expected := log.Fields{
 		"operator":        "test-operator",
 		"category":        logging.AuditCategoryAttempt,
-		"message":         logging.AuditMessageOperationAttempt,
 		"request_payload": fixtureBody,
 	}
 	assert.Equal(t, expected, actualAttempt)
+	assert.Equal(t, logging.AuditMessageOperationAttempt, hook.Entries[0].Message)
 
 	// Assert operation success
 	actualResult := testAssertAndDropDynamicEntryFields(t, hook.Entries[1])
 	expected["category"] = logging.AuditCategorySuccess
-	expected["message"] = logging.AuditMessageOperationSuccess
 	expected["response_payload"] = "test-response-body"
 	assert.Equal(t, expected, actualResult)
+	assert.Equal(t, logging.AuditMessageOperationSuccess, hook.Entries[1].Message)
 
 	// Assert combined
 	assert.Equal(t, hook.Entries[0].Data["operation_start_datetime"], hook.Entries[1].Data["operation_start_datetime"])
@@ -66,17 +66,17 @@ func Test_AuditMiddleware_OperationFail(t *testing.T) {
 	expected := log.Fields{
 		"operator":        "test-operator",
 		"category":        logging.AuditCategoryAttempt,
-		"message":         logging.AuditMessageOperationAttempt,
 		"request_payload": fixtureBody,
 	}
 	assert.Equal(t, expected, actualAttempt)
+	assert.Equal(t, logging.AuditMessageOperationAttempt, hook.Entries[0].Message)
 
 	// Assert operation fail
 	actualResult := testAssertAndDropDynamicEntryFields(t, hook.Entries[1])
 	expected["category"] = logging.AuditCategoryFail
-	expected["message"] = logging.AuditMessageOperationFail
 	expected["response_payload"] = "test-response-body"
 	assert.Equal(t, expected, actualResult)
+	assert.Equal(t, logging.AuditMessageOperationFail, hook.Entries[1].Message)
 
 	// Assert combined
 	assert.Equal(t, hook.Entries[0].Data["operation_start_datetime"], hook.Entries[1].Data["operation_start_datetime"])

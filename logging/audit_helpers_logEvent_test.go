@@ -35,12 +35,12 @@ func Test_logEvent_WithContextAndAdditionalData_Success(t *testing.T) {
 	require.Len(t, hook.Entries, 1)
 	expectedData := log.Fields{
 		"category":               AuditCategorySuccess,
-		"message":                "test-message",
 		"test-additional-string": "test-additional-value",
 		"test-additional-int":    123,
 		"test-meta-key":          "test-meta-value",
 	}
 	assert.Equal(t, expectedData, hook.LastEntry().Data)
+	assert.Equal(t, "test-message", hook.LastEntry().Message)
 	hook.Reset()
 }
 
@@ -55,8 +55,8 @@ func Test_logEvent_Minimal_Success(t *testing.T) {
 	require.Len(t, hook.Entries, 1)
 	expectedData := log.Fields{
 		"category": AuditCategorySuccess,
-		"message":  "test-message",
 	}
 	assert.Equal(t, expectedData, hook.LastEntry().Data)
+	assert.Equal(t, "test-message", hook.LastEntry().Message)
 	hook.Reset()
 }
