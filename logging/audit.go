@@ -4,7 +4,9 @@ package logging
 
 import (
 	"context"
+	"reflect"
 	"strings"
+	"time"
 
 	"github.com/micro/go-micro/v2/metadata"
 	log "github.com/sirupsen/logrus"
@@ -45,8 +47,9 @@ func logEvent(ctx context.Context, message string, category auditCategory, addit
 	// A lower priority (e.g. 3) will be overwritten by higher priority (e.g. 1)
 	//
 	// 1. Directly provided data: message and category
-	// 2. Additionally provided data: additionalData
-	// 3. Metadata present in context: ctx
+	// 2. Derived data: operation_time
+	// 3. Additionally provided data: additionalData
+	// 4. Metadata present in context: ctx
 
 	// Read metadata from context
 	var logFields map[string]interface{}
@@ -68,10 +71,51 @@ func logEvent(ctx context.Context, message string, category auditCategory, addit
 		logFields[key] = value
 	}
 
+	// Derive data
+	deriveOperationTime(logFields)
+
 	// Add directly provided data
 	logFields["message"] = message
 	logFields["category"] = category
 
 	// Send audit to log
 	log.WithFields(logFields).Info(message)
+}
+
+// Calculate operation_time based on operation_start_datetime and set in fields
+func deriveOperationTime(fields log.Fields) {
+	// Extract start from fields
+	startInterface, ok := fields["operation_start_datetime"]
+	if !ok {
+		return
+	}
+
+	// Prepare logging
+	deriveLog := log.WithFields(log.Fields{
+		"field": "operation_start_datetime",
+		"value": startInterface,
+	})
+
+	// Convert value to string
+	startString, ok := startInterface.(string)
+	if !ok {
+		deriveLog.WithField("type", reflect.TypeOf(startInterface)).Error("Expected type string for field operation_start_datetime")
+		return
+	}
+
+	// Parse start to time
+	start, err := time.Parse(time.RFC3339, startString)
+	if err != nil {
+		deriveLog.Error("Unable to parse operation_start_datetime as RFC3339")
+		return
+	}
+
+	// Time should not be initial
+	if start.IsZero() {
+		deriveLog.Error("operation_start_datetime should not contain a zero value")
+		return
+	}
+
+	// Derive and set operation_time
+	fields["operation_time"] = time.Now().Sub(start).Milliseconds()
 }
