@@ -3,6 +3,7 @@ module github.com/skiprco/go-utils
 go 1.14
 
 require (
+	github.com/gin-gonic/gin v1.6.3
 	github.com/micro/go-micro/v2 v2.7.0
 	github.com/pborman/uuid v1.2.1
 	github.com/sirupsen/logrus v1.7.0

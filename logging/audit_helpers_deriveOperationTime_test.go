@@ -1,12 +1,14 @@
 package logging
 
 import (
+	"strconv"
 	"testing"
 	"time"
 
 	"github.com/sirupsen/logrus"
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_deriveOperationTime_Empty_Success(t *testing.T) {
@@ -35,7 +37,9 @@ func Test_deriveOperationTime_Specified_Success(t *testing.T) {
 
 	// Assert result
 	assert.Len(t, hook.Entries, 0)
-	assert.InDelta(t, testFields["operation_time"].(int64), time.Hour.Milliseconds(), float64(time.Second.Milliseconds())) // Check within 1 second accuracy
+	operationTime, err := strconv.Atoi(testFields["operation_time"].(string))
+	require.Nil(t, err)
+	assert.InDelta(t, operationTime, time.Hour.Milliseconds(), float64(time.Second.Milliseconds())) // Check within 1 second accuracy
 	hook.Reset()
 }
 
