@@ -1,4 +1,4 @@
-package logging
+package gin
 
 import (
 	"bytes"
@@ -10,6 +10,7 @@ import (
 	"github.com/micro/go-micro/v2/metadata"
 	"github.com/pborman/uuid"
 	"github.com/skiprco/go-utils/collections"
+	"github.com/skiprco/go-utils/logging"
 )
 
 // AuditMiddleware logs the attempt and result for an API call.
@@ -49,7 +50,7 @@ func AuditMiddleware(operator string) gin.HandlerFunc {
 		additional := map[string]interface{}{ // This data shouldn't be included in the context
 			"request_payload": string(bodyBytes),
 		}
-		AuditOperationAttempt(ctx, additional)
+		logging.AuditOperationAttempt(ctx, additional)
 
 		// Process api call
 		c.Next()
@@ -60,9 +61,9 @@ func AuditMiddleware(operator string) gin.HandlerFunc {
 		// Log operation result
 		ctx = getContextFromGin(c)
 		if c.Writer.Status() < 300 {
-			AuditOperationSuccess(ctx, additional)
+			logging.AuditOperationSuccess(ctx, additional)
 		} else {
-			AuditOperationFail(ctx, additional)
+			logging.AuditOperationFail(ctx, additional)
 		}
 	}
 }
