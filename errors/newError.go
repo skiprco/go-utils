@@ -7,6 +7,7 @@ import (
 
 	microErrors "github.com/micro/go-micro/v2/errors"
 	log "github.com/sirupsen/logrus"
+	"github.com/skiprco/go-utils/collections"
 )
 
 // NewGenericError creates a new generic error.
@@ -20,7 +21,7 @@ func NewGenericError(code int, domain string, subDomain string, subDomainCode st
 		Domain:        domain,
 		SubDomain:     subDomain,
 		SubDomainCode: subDomainCode,
-		Meta:          mergeMeta(defaultMeta, additionalMeta),
+		Meta:          collections.StringMapMerge(defaultMeta, additionalMeta),
 		IsLegacyError: false,
 	}
 }
