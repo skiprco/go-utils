@@ -136,6 +136,13 @@ logging.AuditFact(ctx, "user_update_skipped", additionalData)
 logging.AuditAttempt(ctx, "update_user", nil)
 logging.AuditSuccess(ctx, "update_user", nil)
 logging.AuditFail(ctx, "update_user", nil)
+
+// Add the AuditHandlerWrapper to a service
+service := micro.NewService(
+    micro.Name(manifest.ServiceName),
+)
+service.Server().Init(server.WrapHandler(logging.AuditHandlerWrapper))
+service.Init()
 ```
 
 ### Manifest
