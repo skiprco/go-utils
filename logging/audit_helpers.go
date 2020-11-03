@@ -17,14 +17,14 @@ import (
 // =               CONSTANTS              =
 // ========================================
 
-type auditCategory string
+type AuditCategory string
 
 const (
-	AuditCategoryFact auditCategory = "fact"
+	AuditCategoryFact AuditCategory = "fact"
 
-	AuditCategoryAttempt auditCategory = "attempt"
-	AuditCategorySuccess auditCategory = "success"
-	AuditCategoryFail    auditCategory = "fail"
+	AuditCategoryAttempt AuditCategory = "attempt"
+	AuditCategorySuccess AuditCategory = "success"
+	AuditCategoryFail    AuditCategory = "fail"
 )
 
 const (
@@ -83,7 +83,7 @@ func AuditFail(ctx context.Context, attemptName string, additionalData map[strin
 // =                HELPERS               =
 // ========================================
 
-func logEvent(ctx context.Context, message string, category auditCategory, additionalData map[string]interface{}) {
+func logEvent(ctx context.Context, message string, category AuditCategory, additionalData map[string]interface{}) {
 	// Log priority
 	// A lower priority (e.g. 3) will be overwritten by higher priority (e.g. 1)
 	//
