@@ -87,7 +87,7 @@ func logEvent(ctx context.Context, message string, category auditCategory, addit
 	// Log priority
 	// A lower priority (e.g. 3) will be overwritten by higher priority (e.g. 1)
 	//
-	// 1. Directly provided data: message and category
+	// 1. Directly provided data: category
 	// 2. Derived data: operation_time
 	// 3. Additionally provided data: additionalData
 	// 4. Metadata present in context: ctx
@@ -116,10 +116,10 @@ func logEvent(ctx context.Context, message string, category auditCategory, addit
 	deriveOperationTime(logFields)
 
 	// Add directly provided data
-	logFields["message"] = message
 	logFields["category"] = category
 
 	// Send audit to log
+	delete(logFields, "message")
 	log.WithFields(logFields).Info(message)
 }
 
