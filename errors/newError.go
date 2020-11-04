@@ -7,7 +7,7 @@ import (
 
 	microErrors "github.com/micro/go-micro/v2/errors"
 	log "github.com/sirupsen/logrus"
-	"github.com/skiprco/go-utils/collections"
+	"github.com/skiprco/go-utils/v2/collections"
 )
 
 // NewGenericError creates a new generic error.

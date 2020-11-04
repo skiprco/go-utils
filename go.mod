@@ -1,4 +1,4 @@
-module github.com/skiprco/go-utils
+module github.com/skiprco/go-utils/v2
 
 go 1.14
 

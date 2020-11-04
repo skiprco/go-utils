@@ -3,7 +3,7 @@ package converters
 import (
 	"strings"
 
-	"github.com/skiprco/go-utils/errors"
+	"github.com/skiprco/go-utils/v2/errors"
 )
 
 // CountryCodes returns a constant mapping from country code to country name.

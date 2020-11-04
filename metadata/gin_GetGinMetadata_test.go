@@ -1,4 +1,4 @@
-package gin
+package metadata
 
 import (
 	"net/http"
@@ -8,28 +8,28 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_GetMetadata_Empty(t *testing.T) {
+func Test_GetGinMetadata_Empty(t *testing.T) {
 	// Setup test data
 	ginCtx := &gin.Context{
 		Request: &http.Request{},
 	}
 
 	// Call helper
-	result := GetMetadata(ginCtx)
+	result := GetGinMetadata(ginCtx)
 
 	// Assert results
-	assert.Equal(t, map[string]string{}, result)
+	assert.Equal(t, Metadata{}, result)
 }
 
-func Test_GetMetadata_WithMetadata(t *testing.T) {
+func Test_GetGinMetadata_WithMetadata(t *testing.T) {
 	// Setup test data
 	ginCtx := &gin.Context{
 		Request: &http.Request{},
 	}
-	ginCtx.Set(contextMetadataKey, fixtureMetadata())
+	UpdateGinMetadata(ginCtx, fixtureMetadata())
 
 	// Call helper
-	result := GetMetadata(ginCtx)
+	result := GetGinMetadata(ginCtx)
 
 	// Assert results
 	assert.Equal(t, fixtureMetadata(), result)

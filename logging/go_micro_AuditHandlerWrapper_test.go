@@ -2,13 +2,16 @@ package logging
 
 import (
 	"context"
-	"errors"
+	goErrors "errors"
 	"testing"
 
 	"github.com/micro/go-micro/v2/codec"
+	microMetadata "github.com/micro/go-micro/v2/metadata"
 	"github.com/micro/go-micro/v2/server"
 	"github.com/sirupsen/logrus"
 	logTest "github.com/sirupsen/logrus/hooks/test"
+	"github.com/skiprco/go-utils/v2/errors"
+	"github.com/skiprco/go-utils/v2/metadata"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -53,10 +56,12 @@ func Test_AuditHandlerWrapper_Success(t *testing.T) {
 	hook.Reset()
 }
 
-func Test_AuditHandlerWrapper_Failuer(t *testing.T) {
+func Test_AuditHandlerWrapper_Failure(t *testing.T) {
 	// Setup test
 	hook := logTest.NewGlobal()
-	handler := func(ctx context.Context, req server.Request, rsp interface{}) error { return errors.New("test-error") }
+	handler := func(ctx context.Context, req server.Request, rsp interface{}) error {
+		return goErrors.New("test-error")
+	}
 	request := MicroRequest{}
 
 	// Call helper
@@ -69,4 +74,20 @@ func Test_AuditHandlerWrapper_Failuer(t *testing.T) {
 	testAssertAuditHandlerWrapperEntry(t, hook.Entries[0], AuditCategoryAttempt)
 	testAssertAuditHandlerWrapperEntry(t, hook.Entries[1], AuditCategoryFail)
 	hook.Reset()
+}
+
+func Test_AuditHandlerWrapper_InvalidMetadata(t *testing.T) {
+	// Setup test
+	handler := func(ctx context.Context, req server.Request, rsp interface{}) error { return nil }
+	request := MicroRequest{}
+	ctx := microMetadata.Set(context.Background(), metadata.GoMicroMetadataKey, "invalid")
+
+	// Call helper
+	wrapper := AuditHandlerWrapper(handler)
+	err := wrapper(ctx, request, nil)
+
+	// Assert result
+	require.NotNil(t, err)
+	genErr := errors.NewGenericFromMicroError(err)
+	errors.AssertGenericError(t, genErr, 400, "decode_glob_from_base64_failed", nil)
 }

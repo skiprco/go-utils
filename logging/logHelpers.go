@@ -6,7 +6,7 @@ import (
 
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
-	"github.com/skiprco/go-utils/errors"
+	"github.com/skiprco/go-utils/v2/errors"
 )
 
 // LogHTTPRequestResponse logs a HTTP request and response. Returns a trace ID to link follow-up logs.

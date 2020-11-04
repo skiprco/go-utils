@@ -2,15 +2,13 @@ package gin
 
 import (
 	"bytes"
-	"context"
 	"io/ioutil"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/micro/go-micro/v2/metadata"
 	"github.com/pborman/uuid"
-	"github.com/skiprco/go-utils/collections"
-	"github.com/skiprco/go-utils/logging"
+	"github.com/skiprco/go-utils/v2/logging"
+	"github.com/skiprco/go-utils/v2/metadata"
 )
 
 // AuditMiddleware logs the attempt and result for an API call.
@@ -33,7 +31,7 @@ func AuditMiddleware(operator string) gin.HandlerFunc {
 		c.Writer = blw
 
 		// Build audit data
-		auditData := map[string]string{
+		auditData := metadata.Metadata{
 			"operator":                 operator,
 			"operation_id":             uuid.New(),
 			"operation_start_datetime": time.Now().UTC().Format(time.RFC3339),
@@ -41,12 +39,10 @@ func AuditMiddleware(operator string) gin.HandlerFunc {
 		}
 
 		// Update metadataToPass
-		meta := c.GetStringMapString("metadataToPass")
-		meta = collections.StringMapMerge(meta, auditData)
-		c.Set("metadataToPass", meta)
+		metadata.UpdateGinMetadata(c, auditData)
 
 		// Log operation attempt
-		ctx := getContextFromGin(c)
+		ctx := metadata.ConvertGinToGoMicro(c)
 		additional := map[string]interface{}{ // This data shouldn't be included in the context
 			"request_payload": string(bodyBytes),
 		}
@@ -59,27 +55,13 @@ func AuditMiddleware(operator string) gin.HandlerFunc {
 		additional["response_payload"] = blw.body.String()
 
 		// Log operation result
-		ctx = getContextFromGin(c)
+		ctx = metadata.ConvertGinToGoMicro(c)
 		if c.Writer.Status() < 300 {
 			logging.AuditOperationSuccess(ctx, additional)
 		} else {
 			logging.AuditOperationFail(ctx, additional)
 		}
 	}
-}
-
-func getContextFromGin(c *gin.Context) context.Context {
-	// Extract metadata map from Gin
-	meta := c.GetStringMapString("metadataToPass")
-
-	// Inject each key-value pair in the context
-	ctx := c.Request.Context()
-	for k, v := range meta {
-		ctx = metadata.Set(ctx, k, v)
-	}
-
-	// Return result
-	return ctx
 }
 
 type bodyLogWriter struct {

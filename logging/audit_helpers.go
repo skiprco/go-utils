@@ -6,11 +6,11 @@ import (
 	"context"
 	"reflect"
 	"strconv"
-	"strings"
 	"time"
 
-	"github.com/micro/go-micro/v2/metadata"
 	log "github.com/sirupsen/logrus"
+	"github.com/skiprco/go-utils/v2/converters"
+	"github.com/skiprco/go-utils/v2/metadata"
 )
 
 // ========================================
@@ -94,22 +94,31 @@ func logEvent(ctx context.Context, message string, category AuditCategory, addit
 
 	// Read metadata from context
 	var logFields map[string]interface{}
-	meta, success := metadata.FromContext(ctx)
-	if success && meta != nil {
-		maxLength := len(meta) + len(additionalData) + 2 // for message and category
+	meta, genErr := metadata.GetGoMicroMetadata(ctx)
+	if genErr != nil {
+		// Frontend should not handle errors regarding audit logging.
+		// Therefore, we log an error and ignore the metadata from the context.
+		log.WithField("error", genErr).Error("Failed to extract metadata from go-micro context for audit logging")
+		meta = metadata.Metadata{}
+	}
+
+	if len(meta) != 0 {
+		// Convert metadata.Metadata (map[string]string) to log.Fields (map[string]interface{})
+		maxLength := len(meta) + len(additionalData) + 1 // for category
 		logFields = make(log.Fields, maxLength)
-		for key, value := range meta {
-			lowerKey := strings.ToLower(key)
-			logFields[lowerKey] = value
+		for k, v := range meta {
+			snakeKey := converters.ToSnakeCase(k)
+			logFields[snakeKey] = v
 		}
 	} else {
-		maxLength := len(additionalData) + 2 // for message and category
+		maxLength := len(additionalData) + 1 // for category
 		logFields = make(log.Fields, maxLength)
 	}
 
 	// Add additional data
 	for key, value := range additionalData {
-		logFields[key] = value
+		snakeKey := converters.ToSnakeCase(key)
+		logFields[snakeKey] = value
 	}
 
 	// Derive data

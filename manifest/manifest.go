@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/skiprco/go-utils/errors"
+	"github.com/skiprco/go-utils/v2/errors"
 )
 
 // ManifestFileName is th file name of the manifest

@@ -3,7 +3,7 @@ package converters
 import (
 	"testing"
 
-	"github.com/skiprco/go-utils/errors"
+	"github.com/skiprco/go-utils/v2/errors"
 	"github.com/stretchr/testify/assert"
 )
 
