@@ -13,7 +13,6 @@ func ConvertGinToGoMicro(c *gin.Context) context.Context {
 	// Get base context from request
 	ctx := c.Request.Context()
 
-	// Inject each key-value pair in the context
 	// "genErr" ignored since it can only fail on extracting metadata from context.
 	// This cannot occur since there is no go-micro metadata on the context yet.
 	meta := GetGinMetadata(c)
