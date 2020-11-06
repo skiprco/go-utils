@@ -9,6 +9,23 @@ import (
 )
 
 // ========================================
+// =                COMMON                =
+// ========================================
+func Test_Get_Found(t *testing.T) {
+	meta := Metadata{"test_key": "test_value"}
+	assert.Equal(t, "test_value", meta.Get("test_key"))
+}
+
+func Test_Get_NotFound(t *testing.T) {
+	assert.Equal(t, "", Metadata{}.Get("test_key"))
+}
+
+func Test_Get_Nil(t *testing.T) {
+	var meta Metadata = nil
+	assert.Equal(t, "", meta.Get("test_key"))
+}
+
+// ========================================
 // =              ROUNDTRIPS              =
 // ========================================
 

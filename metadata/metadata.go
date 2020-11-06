@@ -20,6 +20,18 @@ const errSubDomain = "metadata"
 // This type will be the same even when using different packages (gin, go-micro, ...)
 type Metadata map[string]string
 
+// Get tries to fetch the value stored with the provided key.
+// If meta is nil or key doesn't exist, an empty string is returned.
+func (meta Metadata) Get(key string) string {
+	if meta == nil {
+		return ""
+	}
+
+	// Value will automatically default to an empty string with this syntax
+	value, _ := meta[key]
+	return value
+}
+
 // ========================================
 // =                  GOB                 =
 // ========================================
