@@ -12,6 +12,7 @@ import (
     "github.com/skiprco/go-utils/http"
     "github.com/skiprco/go-utils/logging"
     "github.com/skiprco/go-utils/manifest"
+    "github.com/skiprco/go-utils/metadata"
     "github.com/skiprco/go-utils/validation"
 )
 ```
@@ -136,14 +137,11 @@ service := micro.NewService(
 service.Server().Init(server.WrapHandler(logging.AuditHandlerWrapper))
 service.Init()
 
-// Add additional logging info to the context
-ctx, genErr = logging.AddAuditInfo(ctx, Manifest.Name, "OrganisationID", req.ID)
+// AddAuditInfo prefixes the key with the service name, converts it to snake_case and adds the result to the context.
+func AddAuditInfo(ctx context.Context, key string, value string) (context.Context, *errors.GenericError) {}
 
-// Or using a map if you want to add more logging info
-ctx, genErr = logging.AddAuditInfoMap(ctx, Manifest.Name, metadata.Metadata{
-    "MembershipID": req.MembershipID,
-    "OrganisationID": req.OrganisationID,
-})
+// AddAuditInfoMap prefixes each metadata key with the service name, converts them to snake_case and adds the result to the context
+func AddAuditInfoMap(ctx context.Context, info map[string]string) (context.Context, *errors.GenericError) {}
 ```
 
 ### Manifest
@@ -157,28 +155,32 @@ if genErr != nil {
 
 ### Metadata
 ```go
+// Get tries to fetch the value stored with the provided key.
+// If meta is nil or key doesn't exist, an empty string is returned.
+func (meta Metadata) Get(key string) string {}
+
 // GetGinMetadata returns the currently defined metadata from the Gin context
-func GetGinMetadata(c *gin.Context) Metadata
+func GetGinMetadata(c *gin.Context) Metadata {}
 
 // UpdateGinMetadata upserts the metadata stored in the Gin context. Returns result of the merge.
-func UpdateGinMetadata(c *gin.Context, additionalMetadata Metadata) Metadata
+func UpdateGinMetadata(c *gin.Context, additionalMetadata Metadata) Metadata {}
 
 // SetGinMetadata upserts a single key/value pair in the Gin context. Returns result of the merge.
-func SetGinMetadata(c *gin.Context, key string, value string) Metadata
+func SetGinMetadata(c *gin.Context, key string, value string) Metadata {}
 
 // GetGoMicroMetadata returns the currently defined metadata from the go-micro context
-func GetGoMicroMetadata(ctx context.Context) (Metadata, *errors.GenericError)
+func GetGoMicroMetadata(ctx context.Context) (Metadata, *errors.GenericError) {}
 
 // UpdateGoMicroMetadata upserts the metadata stored in the go-micro context. Returns result of the merge.
-func UpdateGoMicroMetadata(ctx context.Context, additionalMetadata Metadata) (context.Context, Metadata, *errors.GenericError)
+func UpdateGoMicroMetadata(ctx context.Context, additionalMetadata Metadata) (context.Context, Metadata, *errors.GenericError) {}
 
 // SetGoMicroMetadata upserts a single key/value pair in the go-micro context. Returns result of the merge.
-func SetGoMicroMetadata(ctx context.Context, key string, value string) (context.Context, Metadata, *errors.GenericError)
+func SetGoMicroMetadata(ctx context.Context, key string, value string) (context.Context, Metadata, *errors.GenericError) {}
 
 // ConvertGinToGoMicro returns a context object with the metadata
 // set as go-micro metadata. This way the metadata can be accessed in
 // each microservices.
-func ConvertGinToGoMicro(c *gin.Context) context.Context
+func ConvertGinToGoMicro(c *gin.Context) context.Context {}
 ```
 
 ### Validation
