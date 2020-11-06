@@ -102,17 +102,12 @@ func logEvent(ctx context.Context, message string, category AuditCategory, addit
 		meta = metadata.Metadata{}
 	}
 
-	if len(meta) != 0 {
-		// Convert metadata.Metadata (map[string]string) to log.Fields (map[string]interface{})
-		maxLength := len(meta) + len(additionalData) + 1 // for category
-		logFields = make(log.Fields, maxLength)
-		for k, v := range meta {
-			snakeKey := converters.ToSnakeCase(k)
-			logFields[snakeKey] = v
-		}
-	} else {
-		maxLength := len(additionalData) + 1 // for category
-		logFields = make(log.Fields, maxLength)
+	// Convert metadata.Metadata (map[string]string) to log.Fields (map[string]interface{})
+	maxLength := len(meta) + len(additionalData) + 1 // for category
+	logFields = make(log.Fields, maxLength)
+	for k, v := range meta {
+		snakeKey := converters.ToSnakeCase(k)
+		logFields[snakeKey] = v
 	}
 
 	// Add additional data
