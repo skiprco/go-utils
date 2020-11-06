@@ -4,8 +4,10 @@ import (
 	"context"
 	"strings"
 
-	"github.com/micro/go-micro/v2/metadata"
 	"github.com/micro/go-micro/v2/server"
+	"github.com/skiprco/go-utils/v2/converters"
+	"github.com/skiprco/go-utils/v2/errors"
+	"github.com/skiprco/go-utils/v2/metadata"
 )
 
 // AuditHandlerWrapper injects the service's name and called endpoint into the context.
@@ -25,8 +27,13 @@ func AuditHandlerWrapper(fn server.HandlerFunc) server.HandlerFunc {
 		endpoint := strings.ToLower(req.Endpoint())
 
 		// Inject info into context
-		ctx = metadata.Set(ctx, "service_name", service)
-		ctx = metadata.Set(ctx, "service_endpoint", endpoint)
+		ctx, _, genErr := metadata.UpdateGoMicroMetadata(ctx, metadata.Metadata{
+			"service_name":     service,
+			"service_endpoint": endpoint,
+		})
+		if genErr != nil {
+			return genErr.ToMicroError()
+		}
 
 		// Log attempt
 		attempt := service + "_" + endpoint
@@ -45,4 +52,25 @@ func AuditHandlerWrapper(fn server.HandlerFunc) server.HandlerFunc {
 		// Return result
 		return err
 	}
+}
+
+// AddAuditInfo prefixes the key with the service name, converts it to snake_case and adds the result to the context.
+func AddAuditInfo(ctx context.Context, shortServiceName string, key string, value string) (context.Context, *errors.GenericError) {
+	key = shortServiceName + "_" + key
+	ctx, _, genErr := metadata.SetGoMicroMetadata(ctx, converters.ToSnakeCase(key), value)
+	return ctx, genErr
+}
+
+// AddAuditInfoMap prefixes each metadata key with the service name, converts them to snake_case and adds the result to the context
+func AddAuditInfoMap(ctx context.Context, shortServiceName string, info map[string]string) (context.Context, *errors.GenericError) {
+	// Fix keys
+	meta := make(metadata.Metadata, len(info))
+	for k, v := range info {
+		key := converters.ToSnakeCase(shortServiceName + "_" + k)
+		meta[key] = v
+	}
+
+	// Update metadata
+	ctx, _, genErr := metadata.UpdateGoMicroMetadata(ctx, meta)
+	return ctx, genErr
 }

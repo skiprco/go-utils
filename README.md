@@ -45,13 +45,16 @@ name := cc["BE"] // name = "Belgium", nil if not found
 name, genErr := converters.CountryCodeToCountryName("BE") // name == "Belgium", genErr.Code is 404 when not found
 
 // Convert a country's name to a country's code, ignoring casing and accents
-code, genErr = CountryNameToCountryCode("CURAÇAO") // code == "CW", genErr.Code is 404 when not found
+code, genErr = converters.CountryNameToCountryCode("CURAÇAO") // code == "CW", genErr.Code is 404 when not found
 ```
 
 #### Strings
 ```go
 // Removes all the accents from the letters in the string, but keeps casing
-normalised, genErr := NormaliseString("Tëst Çôdé (test-result)") // normalised == "Test Code (test-result)"
+normalised, genErr := converters.NormaliseString("Tëst Çôdé (test-result)") // normalised == "Test Code (test-result)"
+
+// Converts a string to snake_case
+output := converters.ToSnakeCase("ThisIS_a-veryRandom_string") // output == "this_is_a_very_random_string"
 ```
 
 ### Errors
@@ -72,17 +75,6 @@ genErr := errors.NewGenericFromMicroError(microError)
 // - Logs each request and response
 // - Injects metadata into the context to support audit logging in other services
 router.Use(gin.AuditMiddleware("booking-api"))
-
-// Fetch current metadata from Gin context
-meta := GetMetadata(c)
-
-// Update metadata in Gin context
-additionalMeta := map[string]string{ ... }
-updatedMeta := UpdateMetadata(c, additionalMeta)
-
-// Fetch context with metadata from Gin context
-ctx := GetContextWithMetadata(c)
-response, err := or.OrganisationClient.CreateOrganisationFromVAT(ctx, request)
 ```
 
 ### HTTP
@@ -100,7 +92,7 @@ httpResponse, genErr := http.CallRaw("POST", "https://skipr.co", "files", file, 
 
 // In case the server returns an error code (>= 300), the http.Response is still returned.
 // This way, you can translate the body to a more specific error using below setup
-res, genErr := Call("POST", "https://skipr.co", "/test", request, response, nil, nil)
+res, genErr := http.Call("POST", "https://skipr.co", "/test", request, response, nil, nil)
 if genErr != nil {
     if genErr.SubDomainCode != "response_code_is_error" {
         return nil, genErr
@@ -143,6 +135,15 @@ service := micro.NewService(
 )
 service.Server().Init(server.WrapHandler(logging.AuditHandlerWrapper))
 service.Init()
+
+// Add additional logging info to the context
+ctx, genErr = logging.AddAuditInfo(ctx, Manifest.Name, "OrganisationID", req.ID)
+
+// Or using a map if you want to add more logging info
+ctx, genErr = logging.AddAuditInfoMap(ctx, Manifest.Name, metadata.Metadata{
+    "MembershipID": req.MembershipID,
+    "OrganisationID": req.OrganisationID,
+})
 ```
 
 ### Manifest
@@ -154,10 +155,36 @@ if genErr != nil {
 }
 ```
 
+### Metadata
+```go
+// GetGinMetadata returns the currently defined metadata from the Gin context
+func GetGinMetadata(c *gin.Context) Metadata
+
+// UpdateGinMetadata upserts the metadata stored in the Gin context. Returns result of the merge.
+func UpdateGinMetadata(c *gin.Context, additionalMetadata Metadata) Metadata
+
+// SetGinMetadata upserts a single key/value pair in the Gin context. Returns result of the merge.
+func SetGinMetadata(c *gin.Context, key string, value string) Metadata
+
+// GetGoMicroMetadata returns the currently defined metadata from the go-micro context
+func GetGoMicroMetadata(ctx context.Context) (Metadata, *errors.GenericError)
+
+// UpdateGoMicroMetadata upserts the metadata stored in the go-micro context. Returns result of the merge.
+func UpdateGoMicroMetadata(ctx context.Context, additionalMetadata Metadata) (context.Context, Metadata, *errors.GenericError)
+
+// SetGoMicroMetadata upserts a single key/value pair in the go-micro context. Returns result of the merge.
+func SetGoMicroMetadata(ctx context.Context, key string, value string) (context.Context, Metadata, *errors.GenericError)
+
+// ConvertGinToGoMicro returns a context object with the metadata
+// set as go-micro metadata. This way the metadata can be accessed in
+// each microservices.
+func ConvertGinToGoMicro(c *gin.Context) context.Context
+```
+
 ### Validation
 
 #### Country code
 ```go
 // Checks if a country code is valid. An empty code is considered valid as well.
-valid := ValidateCountryCode("BE") // valid == true
+valid := validation.ValidateCountryCode("BE") // valid == true
 ```

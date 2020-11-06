@@ -7,8 +7,8 @@ import (
 	"net/http"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/skiprco/go-utils/errors"
-	"github.com/skiprco/go-utils/logging"
+	"github.com/skiprco/go-utils/v2/errors"
+	"github.com/skiprco/go-utils/v2/logging"
 )
 
 // Call marshals the body to JSON and sends a HTTP request. Response is parsed as JSON.
