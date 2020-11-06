@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/micro/go-micro/v2/server"
+	log "github.com/sirupsen/logrus"
 	"github.com/skiprco/go-utils/v2/converters"
 	"github.com/skiprco/go-utils/v2/errors"
 	"github.com/skiprco/go-utils/v2/metadata"
@@ -55,22 +56,51 @@ func AuditHandlerWrapper(fn server.HandlerFunc) server.HandlerFunc {
 }
 
 // AddAuditInfo prefixes the key with the service name, converts it to snake_case and adds the result to the context.
-func AddAuditInfo(ctx context.Context, shortServiceName string, key string, value string) (context.Context, *errors.GenericError) {
-	key = shortServiceName + "_" + key
-	ctx, _, genErr := metadata.SetGoMicroMetadata(ctx, converters.ToSnakeCase(key), value)
+func AddAuditInfo(ctx context.Context, key string, value string) (context.Context, *errors.GenericError) {
+	// Fetch service name
+	serviceName, genErr := getFieldFromMeta(ctx, "service_name")
+	if genErr != nil {
+		return ctx, genErr
+	}
+
+	// Update metadata
+	key = serviceName + "_" + key
+	ctx, _, genErr = metadata.SetGoMicroMetadata(ctx, converters.ToSnakeCase(key), value)
 	return ctx, genErr
 }
 
 // AddAuditInfoMap prefixes each metadata key with the service name, converts them to snake_case and adds the result to the context
-func AddAuditInfoMap(ctx context.Context, shortServiceName string, info map[string]string) (context.Context, *errors.GenericError) {
+func AddAuditInfoMap(ctx context.Context, info map[string]string) (context.Context, *errors.GenericError) {
+	// Fetch service name
+	serviceName, genErr := getFieldFromMeta(ctx, "service_name")
+	if genErr != nil {
+		return ctx, genErr
+	}
+
 	// Fix keys
 	meta := make(metadata.Metadata, len(info))
 	for k, v := range info {
-		key := converters.ToSnakeCase(shortServiceName + "_" + k)
+		key := converters.ToSnakeCase(serviceName + "_" + k)
 		meta[key] = v
 	}
 
 	// Update metadata
-	ctx, _, genErr := metadata.UpdateGoMicroMetadata(ctx, meta)
+	ctx, _, genErr = metadata.UpdateGoMicroMetadata(ctx, meta)
 	return ctx, genErr
+}
+
+func getFieldFromMeta(ctx context.Context, key string) (string, *errors.GenericError) {
+	// Metadata from context
+	meta, genErr := metadata.GetGoMicroMetadata(ctx)
+	if genErr != nil {
+		return "", genErr
+	}
+
+	// Extract service name
+	serviceName := meta.Get(key)
+	if serviceName == "" {
+		log.WithField("meta", meta).WithField("key", key).Error("Key not found in context")
+		return "", errors.NewGenericError(500, errDomain, errSubDomain, key+"_not_found_in_context", nil)
+	}
+	return serviceName, nil
 }
