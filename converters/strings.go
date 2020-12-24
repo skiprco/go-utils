@@ -22,6 +22,7 @@ func NormaliseString(input string) (string, *errors.GenericError) {
 	// Handle error
 	if err != nil {
 		log.WithField("input", input).WithField("error", err).Error("Unable to normalise string")
+		return "", errors.NewGenericError(404, "go_utils", "common", "failed_to_normalise_string", nil)
 	}
 
 	// Normalise successful
