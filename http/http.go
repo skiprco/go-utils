@@ -119,6 +119,7 @@ func sendRequest(req *http.Request) (*http.Response, *errors.GenericError) {
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
+		log.WithField("error", err).Error("Failed to send HTTP request")
 		logging.LogHTTPRequestResponse(req, res, log.ErrorLevel, "Send request failed")
 		return nil, errors.NewGenericError(421, "go_utils", "common", "send_http_request_failed", nil)
 	}
