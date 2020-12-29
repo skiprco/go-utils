@@ -288,3 +288,9 @@ func CountryNameToCountryCode(countryName string) (string, *errors.GenericError)
 	}
 	return "", errors.NewGenericError(404, "go_utils", "common", "country_not_found", nil)
 }
+
+// IsValidCountryCode checks if a given country code is valid
+func IsValidCountryCode(countryCode string) bool {
+	_, ok := CountryCodes()[countryCode]
+	return ok
+}

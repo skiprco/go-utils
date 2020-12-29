@@ -36,3 +36,13 @@ func Test_CountryNameToCountryCode_Failure(t *testing.T) {
 	assert.Equal(t, "", result)
 	errors.AssertGenericError(t, genErr, 404, "country_not_found", nil)
 }
+
+func Test_IsValidCountryCode_Success(t *testing.T) {
+	result := IsValidCountryCode("BE")
+	assert.True(t, result)
+}
+
+func Test_IsValidCountryCode_Failure(t *testing.T) {
+	result := IsValidCountryCode("BEL")
+	assert.False(t, result)
+}
