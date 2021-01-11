@@ -5,6 +5,8 @@ import (
 	"github.com/skiprco/go-utils/v2/errors"
 )
 
+// ValidateAndFormatPhoneNumber checks if the provided phone number is valid.
+// If yes, it will format it to its E164 representation (e.g +32...)
 func ValidateAndFormatPhoneNumber(phoneNumber string, countryCode string) (string, *errors.GenericError) {
 	// This function will format any phoneNumber to its E164 representation (e.g +32...)
 	//If the phoneNumber is already well formatted the parsing will succeed even with no country code
