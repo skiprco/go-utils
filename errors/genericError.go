@@ -29,6 +29,11 @@ func (e GenericError) GetDetailString() string {
 	// Build meta string
 	metaList := []string{}
 	for key, value := range e.Meta {
+		// Replace restricted characters = and ;
+		value = strings.ReplaceAll(value, "=", "_")
+		value = strings.ReplaceAll(value, ";", "_")
+
+		// Build metadata pair
 		metaList = append(metaList, fmt.Sprintf("%s=%s", key, value))
 	}
 

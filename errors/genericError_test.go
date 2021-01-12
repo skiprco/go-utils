@@ -23,13 +23,21 @@ func TestGenericError_GetDetailStringWithMeta(t *testing.T) {
 	SetupDefaults(defaultMeta)
 
 	// Get error string
-	meta := map[string]string{"additional": "success"}
+	meta := map[string]string{
+		"additional":           "success",
+		"restricted_equal":     "succ=ess",
+		"restricted_semicolon": "succ;ess",
+		"restricted_mixed":     "s=u;ccess",
+	}
 	detailString := NewGenericError(418, "test_domain", "test_subdomain", "test_error", meta).GetDetailString()
 
 	// Assert result
 	assert.Regexp(t, `^test_domain/test_subdomain/test_error/.+=.+(;.+?=.+?)*$`, detailString)
 	assert.Contains(t, detailString, `provider=test_provider`)
 	assert.Contains(t, detailString, `additional=success`)
+	assert.Contains(t, detailString, `restricted_equal=succ_ess`)
+	assert.Contains(t, detailString, `restricted_semicolon=succ_ess`)
+	assert.Contains(t, detailString, `restricted_mixed=s_u_ccess`)
 }
 
 func TestGenericError_ConvertToString(t *testing.T) {
