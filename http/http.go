@@ -134,17 +134,19 @@ func sendRequest(req *http.Request) (*http.Response, *errors.GenericError) {
 	switch {
 	// API responded with an error
 	case res.StatusCode >= 300:
-		body, genErr := duplicateAndReturnResponseBody(res, traceID)
+		bodyBytes, genErr := duplicateAndReturnResponseBody(res, traceID)
 		if genErr != nil {
 			return nil, genErr
 		}
+		body := string(bodyBytes)
 
 		// Log and return error
 		log.WithFields(log.Fields{
-			"body":     string(body),
+			"body":     body,
 			"trace_id": traceID,
 		}).Warn("HTTP response code is error")
-		return res, errors.NewGenericError(res.StatusCode, "go_utils", "common", "response_code_is_error", nil)
+		meta := map[string]string{"response_body": body}
+		return res, errors.NewGenericError(res.StatusCode, "go_utils", "common", "response_code_is_error", meta)
 
 	// API responded with 2xx Success
 	default:
