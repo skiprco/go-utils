@@ -118,7 +118,7 @@ func Test_Call_400(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "error_during_test", string(body))
 	assert.Equal(t, &responseSample{}, response)
-	errors.AssertGenericError(t, genErr, 400, "response_code_is_error", nil)
+	errors.AssertGenericError(t, genErr, 400, "response_code_is_error", map[string]string{"response_body": "error_during_test"})
 }
 
 func Test_Call_MarshalRequestBodyFailed_Failure(t *testing.T) {

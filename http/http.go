@@ -12,6 +12,24 @@ import (
 )
 
 // Call marshals the body to JSON and sends a HTTP request. Response is parsed as JSON.
+//
+// Raises
+//
+// - 500/marshal_request_body_failed: Failed to marshal request body to JSON
+//
+// - 421/send_http_request_failed: Failed to send request (e.g. server unreachable)
+//
+// - 421/read_response_body_failed: Failed to read response body (only tried if response code is < 300)
+//
+// - 500/read_response_body_failed: Failed to read response body into a string (only tried if response code is >= 300)
+//
+// - dyn/response_code_is_error: Server returned an error code.
+// In case the full response will be returned. Also the response body is present on
+// the error meta as key "response_body". This way, you can translate the body to a more
+// specific error in an easy way. When you miss a translation, the full body is present on the
+// error for easier debugging.
+//
+// - 421/parse_response_body_failed: Failed to parse JSON response into provided response interface
 func Call(method string, rootURL string, path string, body interface{}, response interface{}, query map[string]string, headers map[string]string) (*http.Response, *errors.GenericError) {
 	// Set Content-Type to JSON
 	if headers == nil {
@@ -72,6 +90,18 @@ func Call(method string, rootURL string, path string, body interface{}, response
 }
 
 // CallRaw sends a HTTP request without modifying the body
+//
+// Raises
+//
+// - 421/send_http_request_failed: Failed to send request (e.g. server unreachable)
+//
+// - 500/read_response_body_failed: Failed to read response body into a string (only tried if response code is >= 300)
+//
+// - dyn/response_code_is_error: Server returned an error code.
+// In case the full response will be returned. Also the response body is present on
+// the error meta as key "response_body". This way, you can translate the body to a more
+// specific error in an easy way. When you miss a translation, the full body is present on the
+// error for easier debugging.
 func CallRaw(method string, rootURL string, path string, body []byte, query map[string]string, headers map[string]string) (*http.Response, *errors.GenericError) {
 	// Create request
 	req := createRequest(method, rootURL, path, body, query, headers)
@@ -134,17 +164,19 @@ func sendRequest(req *http.Request) (*http.Response, *errors.GenericError) {
 	switch {
 	// API responded with an error
 	case res.StatusCode >= 300:
-		body, genErr := duplicateAndReturnResponseBody(res, traceID)
+		bodyBytes, genErr := duplicateAndReturnResponseBody(res, traceID)
 		if genErr != nil {
 			return nil, genErr
 		}
+		body := string(bodyBytes)
 
 		// Log and return error
 		log.WithFields(log.Fields{
-			"body":     string(body),
+			"body":     body,
 			"trace_id": traceID,
 		}).Warn("HTTP response code is error")
-		return res, errors.NewGenericError(res.StatusCode, "go_utils", "common", "response_code_is_error", nil)
+		meta := map[string]string{"response_body": body}
+		return res, errors.NewGenericError(res.StatusCode, "go_utils", "common", "response_code_is_error", meta)
 
 	// API responded with 2xx Success
 	default:
