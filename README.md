@@ -190,3 +190,10 @@ func ConvertGinToGoMicro(c *gin.Context) context.Context {}
 // Checks if a country code is valid. An empty code is considered valid as well.
 valid := validation.ValidateCountryCode("BE") // valid == true
 ```
+
+#### Country code
+```go
+// ValidateAndFormatPhoneNumber checks if the provided phone number is valid.
+// If yes, it will format it to its E164 representation (e.g +32...)
+number, genErr := validation.ValidateAndFormatPhoneNumber("+32 478 12 34 56") // number == "+32478123456"
+```
