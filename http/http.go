@@ -2,9 +2,11 @@ package http
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/skiprco/go-utils/v2/errors"
@@ -202,4 +204,22 @@ func duplicateAndReturnResponseBody(res *http.Response, traceID string) ([]byte,
 
 	// Return body
 	return body, nil
+}
+
+// UnwrapResponseCodeIsError checks if the error has code "response_code_is_error".
+// If yes, it extracts the error message and builds the metadata for audit logging as well.
+// If no, these will be filled with zero values.
+func UnwrapResponseCodeIsError(ctx context.Context, genErr *errors.GenericError) (string, map[string]interface{}, bool) {
+	// Return original error if not code "response_code_is_error"
+	auditMeta := map[string]interface{}{}
+	if genErr.SubDomainCode != "response_code_is_error" {
+		return "", auditMeta, false
+	}
+
+	// Add response body to audit meta
+	errorMsg := genErr.Meta["response_body"]
+	auditMeta["response_body"] = errorMsg
+
+	// Convert error message to lowercase for comparison
+	return strings.ToLower(errorMsg), auditMeta, true
 }
