@@ -96,10 +96,25 @@ httpResponse, genErr := http.CallRaw("POST", "https://skipr.co", "files", file, 
 // This way, you can translate the body to a more specific error using below setup.
 res, genErr := http.Call("POST", "https://skipr.co", "/test", request, response, nil, nil)
 if genErr != nil {
-    if genErr.SubDomainCode != "response_code_is_error" {
+    // UnwrapResponseCodeIsError checks if the error has code "response_code_is_error".
+    // If yes, it extracts the error message and builds the metadata for audit logging as well.
+    // If no, these will be filled with zero values.
+    //
+    // Check if genErr has subdomain code "response_code_is_error"
+    errorMsg, auditMeta, ok := http.UnwrapResponseCodeIsError(ctx, genErr)
+    logging.AuditFail(ctx, "...", auditMeta)
+    if !ok {
         return nil, genErr
     }
-    return nil, translateResponseToSpecificError(genErr.Meta["response_body"])
+
+    // Translate error to a more specific one
+    switch {
+        case strings.Contains(errorMsg, "..."):
+            ...
+    }
+
+    // No specific error matched => Return original
+    return nil, genErr
 }
 ```
 
