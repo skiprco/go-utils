@@ -15,8 +15,12 @@ func Test_CleanPhoneNumberWithInvisibleChar_success(t *testing.T){
 	assert.Equal(t, "+32475000001", result)
 }
 
-
 func Test_CleanPhoneNumberWithUnicode_success(t *testing.T){
 	result := CleanPhoneNumber("+32475000001\u200b")
 	assert.Equal(t, "+32475000001", result)
+}
+
+func Test_CleanPhoneNumberWithEmpty_success(t *testing.T){
+	result := CleanPhoneNumber("")
+	assert.Equal(t, "", result)
 }
