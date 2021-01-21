@@ -213,3 +213,12 @@ valid := validation.ValidateCountryCode("BE") // valid == true
 // If yes, it will format it to its E164 representation (e.g +32...)
 number, genErr := validation.ValidateAndFormatPhoneNumber("+32 478 12 34 56") // number == "+32478123456"
 ```
+
+#### Time
+```go
+// WithinTimeRange checks if the "nowTime" lies between "startTime" (including) and "endTime" (excluding).
+now := time.Now()
+start := now.Add(-time.Hour)
+end := now.Add(time.Hour)
+within, genErr := validation.WithinTimeRange(now, start, end) // within = true
+```
