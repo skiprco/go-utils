@@ -49,3 +49,25 @@ func Test_ToSnakeCase(t *testing.T) {
 		assert.Equal(t, test.expected, result)
 	}
 }
+
+func Test_CleanSpecialCharacters(t *testing.T) {
+	var tests = []struct {
+		name   string
+		input  string
+		output string
+	}{
+		{"Input already clean", "1111AA2", "1111AA2"},
+		{"Remove special characters", "1111.222-B!?*5", "1111222B5"},
+		{"Remove spaces", "1111		AA 2", "1111AA2"},
+		{"Normalise input", "1111AA 2Ç", "1111AA2C"},
+		{"Empty input", "", ""},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			response, _ := CleanSpecialCharacters(tt.input)
+			assert.Equal(t, tt.output, response)
+		})
+	}
+
+}

@@ -40,3 +40,15 @@ func ToSnakeCase(input string) string {
 	output = strings.ReplaceAll(output, "-", "_")
 	return strings.ToLower(output)
 }
+
+/*
+CleanSpecialCharacters removes any character(included spaces) which is not a digit or a letter from the input
+*/
+func CleanSpecialCharacters(input string) (string, *errors.GenericError) {
+	normalisedInput, genErr := NormaliseString(input)
+	if genErr != nil {
+		return "", genErr
+	}
+	regExp := regexp.MustCompile(`[^0-9a-zA-Z]+`)
+	return regExp.ReplaceAllLiteralString(normalisedInput, ""), nil
+}
