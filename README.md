@@ -56,6 +56,9 @@ normalised, genErr := converters.NormaliseString("Tëst Çôdé (test-result)") 
 
 // Converts a string to snake_case
 output := converters.ToSnakeCase("ThisIS_a-veryRandom_string") // output == "this_is_a_very_random_string"
+
+// Removes any character(included spaces) which is not a digit or a letter from a string to snake_case
+output := converters.CleanSpecialCharacters("dir.ty-Str*in//g :)") // output == "dirtyString"
 ```
 
 ### Errors
