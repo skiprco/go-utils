@@ -59,7 +59,7 @@ func Test_CleanSpecialCharacters(t *testing.T) {
 		{"Input already clean", "1111AA2", "1111AA2"},
 		{"Remove special characters", "1111.222-B!?*5", "1111222B5"},
 		{"Remove spaces", "1111		AA 2", "1111AA2"},
-		{"Normalisse input", "1111AA 2Ç", "1111AA2C"},
+		{"Normalise input", "1111AA 2Ç", "1111AA2C"},
 		{"Empty input", "", ""},
 	}
 
