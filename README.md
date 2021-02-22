@@ -190,6 +190,11 @@ func SetGinMetadata(c *gin.Context, key string, value string) Metadata {}
 // GetGoMicroMetadata returns the currently defined metadata from the go-micro context
 func GetGoMicroMetadata(ctx context.Context) (Metadata, *errors.GenericError) {}
 
+// GetUserIDFromGoMicroMeta extracts the user ID from the metadata of go-micro
+// and also returns the raw metadata for later use. Throws an error if unable
+// to read metadata or if user_id is not set.
+func GetUserIDFromGoMicroMeta(ctx context.Context, errorDomain string) (string, Metadata, *errors.GenericError) {}
+
 // UpdateGoMicroMetadata upserts the metadata stored in the go-micro context. Returns result of the merge.
 func UpdateGoMicroMetadata(ctx context.Context, additionalMetadata Metadata) (context.Context, Metadata, *errors.GenericError) {}
 
