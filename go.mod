@@ -10,4 +10,5 @@ require (
 	github.com/sirupsen/logrus v1.7.0
 	github.com/stretchr/testify v1.6.1
 	golang.org/x/text v0.3.4
+	go.mongodb.org/mongo-driver v1.4.2
 )
