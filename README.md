@@ -228,7 +228,7 @@ within, genErr := validation.WithinTimeRange(now, start, end) // within = true
 ### mongo
 ```go
 // init mongo client & collection
-repo, genErr := repository.NewMongoRepository(context.Background(), "mongoAddress", "mongoDBName", "CollectionName")
+repo, genErr := repository.NewMongoRepository(context.Background(), "mongoAddress", "mongoDBName", []string{"CollectionName"})
 
 // query
 query := map[string]interface{}{
@@ -237,11 +237,11 @@ query := map[string]interface{}{
 	}
 
 // count
-count := Count(ctx, "CollectionName", query, "functionName")
+count := repo.Count(ctx, "CollectionName", query, "functionName")
 
 // get one function call
 result := &myEntityStruct{}
-genErr := repo.repository.GetOne(ctx, "CollectionName", query, true, result,"functionName")
+genErr := repo.GetOne(ctx, "CollectionName", query, true, result,"functionName")
 if genErr != nil {
     // manage genErr
     
@@ -256,9 +256,9 @@ if result.Id != "" {
  		"status": "pending",
  	}
 result := &[]myEntityStruct{}
-genErr := r.usersRepository.GetMultiple(ctx, "CollectionName", query, results,"functionName")
+genErr := repo.GetMultiple(ctx, "CollectionName", query, results,"functionName")
 
 // Save & delete
-Save(ctx, "CollectionName", myEntity, myEntity.Id, "functionName")
-Delete(ctx, "CollectionName", myEntity.Id, "functionName")
+repo.Save(ctx, "CollectionName", myEntity, myEntity.Id, "functionName")
+repo.Delete(ctx, "CollectionName", myEntity.Id, "functionName")
 ```
