@@ -20,10 +20,6 @@ import (
 
 ### Auth
 ```go
-// ErrorNotEnoughPrivileges indicates the user tried to access a
-// resource for which it doesn't have enough privileges.
-const ErrorNotEnoughPrivileges = "not_enough_privileges"
-
 // AuthOverridePrefix contains the prefix you have to use to override the authentication.
 // This is needed when the action is not invoked by a user (e.g. callback by provider).
 const AuthOverridePrefix = "system_override_"
@@ -40,13 +36,9 @@ const RoleOperatorWrite = "OPERATOR_WRITE"
 // RoleOperatorAdmin is a user role means the user has read-write access to all data and can modify the roles of other users
 const RoleOperatorAdmin = "OPERATOR_ADMIN"
 
-// OperatorRead checks if the provided roles contain the OPERATOR_READ role.
-// This role might be granted implicitely (e.g. on OPERATOR_ADMIN).
-func OperatorRead(roles []string) bool {}
-
-// OperatorWrite checks if the provided roles contain the OPERATOR_WRITE role.
-// This role might be granted implicitely (e.g. on OPERATOR_ADMIN).
-func OperatorWrite(roles []string) bool {}
+// HasRole checks if the provided roles is included in the user roles.
+// This role might be granted implicitely (e.g. OPERATOR_READ on OPERATOR_ADMIN).
+func HasRole(role string, userRoles []string) (bool, *errors.GenericError) {}
 
 // IsOverride checks if the provided user ID has a prefix to override the authentication.
 // Overrides will be clearly logged.

@@ -1,12 +1,8 @@
 package auth
 
-// ErrorNotEnoughPrivileges indicates the user tried to access a
-// resource for which it doesn't have enough privileges.
-const ErrorNotEnoughPrivileges = "not_enough_privileges"
-
-// AuthOverridePrefix contains the prefix you have to use to override the authentication.
-// This is needed when the action is not invoked by a user (e.g. callback by provider).
-const AuthOverridePrefix = "system_override_"
+// =====================================
+// =               ROLES               =
+// =====================================
 
 // RoleUser is a user role which means the user is using the Skipr application
 const RoleUser = "USER"
@@ -19,3 +15,48 @@ const RoleOperatorWrite = "OPERATOR_WRITE"
 
 // RoleOperatorAdmin is a user role means the user has read-write access to all data and can modify the roles of other users
 const RoleOperatorAdmin = "OPERATOR_ADMIN"
+
+// =====================================
+// =           ROLE MAPPINGS           =
+// =====================================
+
+var roleMapUser = map[string]bool{
+	RoleUser: true,
+}
+
+var roleMapOperatorRead = map[string]bool{
+	RoleOperatorRead:  true,
+	RoleOperatorWrite: true,
+	RoleOperatorAdmin: true,
+}
+
+var roleMapOperatorWrite = map[string]bool{
+	RoleOperatorWrite: true,
+	RoleOperatorAdmin: true,
+}
+
+var roleMapOperatorAdmin = map[string]bool{
+	RoleOperatorAdmin: true,
+}
+
+// =====================================
+// =               ERRORS              =
+// =====================================
+
+const errorDomain = "go-utils"
+const errorSubDomain = "auth"
+
+// ErrorNotEnoughPrivileges indicates the user tried to access a
+// resource for which it doesn't have enough privileges.
+const ErrorNotEnoughPrivileges = "not_enough_privileges"
+
+// ErrorUnknownRole indicates the checked role doesn't exist.
+const ErrorUnknownRole = "unknown_role"
+
+// =====================================
+// =               OTHER               =
+// =====================================
+
+// AuthOverridePrefix contains the prefix you have to use to override the authentication.
+// This is needed when the action is not invoked by a user (e.g. callback by provider).
+const AuthOverridePrefix = "system_override_"

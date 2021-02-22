@@ -1,24 +1,27 @@
 package auth
 
-// OperatorRead checks if the provided roles contain the OPERATOR_READ role.
-// This role might be granted implicitely (e.g. on OPERATOR_ADMIN).
-func OperatorRead(roles []string) bool {
-	readRoles := map[string]bool{
-		RoleOperatorRead:  true,
-		RoleOperatorWrite: true,
-		RoleOperatorAdmin: true,
-	}
-	return checkRoles(readRoles, roles)
-}
+import "github.com/skiprco/go-utils/v2/errors"
 
-// OperatorWrite checks if the provided roles contain the OPERATOR_WRITE role.
-// This role might be granted implicitely (e.g. on OPERATOR_ADMIN).
-func OperatorWrite(roles []string) bool {
-	readRoles := map[string]bool{
-		RoleOperatorWrite: true,
-		RoleOperatorAdmin: true,
+// HasRole checks if the provided roles is included in the user roles.
+// This role might be granted implicitely (e.g. OPERATOR_READ on OPERATOR_ADMIN).
+//
+// Raises
+//
+// - 400/unknown_role: Provided role does not exist
+func HasRole(role string, userRoles []string) (bool, *errors.GenericError) {
+	switch role {
+	case RoleUser:
+		return checkRoles(roleMapUser, userRoles), nil
+	case RoleOperatorRead:
+		return checkRoles(roleMapOperatorRead, userRoles), nil
+	case RoleOperatorWrite:
+		return checkRoles(roleMapOperatorWrite, userRoles), nil
+	case RoleOperatorAdmin:
+		return checkRoles(roleMapOperatorAdmin, userRoles), nil
+	default:
+		meta := map[string]string{"role": role}
+		return false, errors.NewGenericError(400, errorDomain, errorSubDomain, ErrorUnknownRole, meta)
 	}
-	return checkRoles(readRoles, roles)
 }
 
 func checkRoles(allowedRoles map[string]bool, userRoles []string) bool {

@@ -27,6 +27,10 @@ type HasRoleCheck func(ctx context.Context, userID string) (bool, *errors.Generi
 
 // MustHaveRole is a helper to ease the implementation of access control checks.
 // This helper should be called by a specific helper for the service which implements the access control.
+//
+// Raises
+//
+// - 403/not_enough_privileges: User doesn't have enough privileges
 func MustHaveRole(ctx context.Context, hasRoleCheck HasRoleCheck, userID string, errorDomain string, subDomain string) *errors.GenericError {
 	// Check for override
 	if IsOverride(ctx, userID, subDomain) {
