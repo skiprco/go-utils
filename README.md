@@ -225,3 +225,40 @@ start := now.Add(-time.Hour)
 end := now.Add(time.Hour)
 within, genErr := validation.WithinTimeRange(now, start, end) // within = true
 ```
+### mongo
+```go
+// init mongo client & collection
+repo, genErr := repository.NewMongoRepository(context.Background(), "mongoAddress", "mongoDBName", []string{"CollectionName"})
+
+// query
+query := map[string]interface{}{
+		"id":      "123456",
+		"status": "pending",
+	}
+
+// count
+count := repo.Count(ctx, "CollectionName", query, "functionName")
+
+// get one function call
+result := &myEntityStruct{}
+genErr := repo.GetOne(ctx, "CollectionName", query, true, result,"functionName")
+if genErr != nil {
+    // manage genErr
+    
+}
+// result is populate from database information
+if result.Id != "" {
+    // Be careful : as acceptsEmptyResult parameter is true, if the entity is not found the field of result will empty
+}
+
+// get multiple function call
+ query := map[string]interface{}{
+ 		"status": "pending",
+ 	}
+result := &[]myEntityStruct{}
+genErr := repo.GetMultiple(ctx, "CollectionName", query, results,"functionName")
+
+// Save & delete
+repo.Save(ctx, "CollectionName", myEntity, myEntity.Id, "functionName")
+repo.Delete(ctx, "CollectionName", myEntity.Id, "functionName")
+```
