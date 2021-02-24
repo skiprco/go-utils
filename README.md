@@ -5,6 +5,7 @@ Common utils for Golang
 ### Import
 ```go
 import (
+    "github.com/skiprco/go-utils/auth"
     "github.com/skiprco/go-utils/collections"
     "github.com/skiprco/go-utils/converters"
     "github.com/skiprco/go-utils/errors"
@@ -15,6 +16,40 @@ import (
     "github.com/skiprco/go-utils/metadata"
     "github.com/skiprco/go-utils/validation"
 )
+```
+
+### Auth
+```go
+// AuthOverridePrefix contains the prefix you have to use to override the authentication.
+// This is needed when the action is not invoked by a user (e.g. callback by provider).
+const AuthOverridePrefix = "system_override_"
+
+// RoleUser is a user role which means the user is using the Skipr application
+const RoleUser = "USER"
+
+// RoleOperatorRead is a user role means the operator has read-only access to all data
+const RoleOperatorRead = "OPERATOR_READ"
+
+// RoleOperatorWrite is a user role means the operator has read-write access to all data
+const RoleOperatorWrite = "OPERATOR_WRITE"
+
+// RoleOperatorAdmin is a user role means the user has read-write access to all data and can modify the roles of other users
+const RoleOperatorAdmin = "OPERATOR_ADMIN"
+
+// HasRole checks if the provided roles is included in the user roles.
+// This role might be granted implicitely (e.g. OPERATOR_READ on OPERATOR_ADMIN).
+func HasRole(role string, userRoles []string) (bool, *errors.GenericError) {}
+
+// IsOverride checks if the provided user ID has a prefix to override the authentication.
+// Overrides will be clearly logged.
+func IsOverride(ctx context.Context, userID string, subDomain string) bool {}
+
+// HasRoleCheck is a helper function to validate if a user has a specific role
+type HasRoleCheck func(ctx context.Context, userID string) (bool, *errors.GenericError)
+
+// MustHaveRole is a helper to ease the implementation of access control checks.
+// This helper should be called by a specific helper for the service which implements the access control.
+func MustHaveRole(ctx context.Context, hasRoleCheck HasRoleCheck, userID string, errorDomain string, subDomain string) *errors.GenericError {}
 ```
 
 ### Collections
