@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"unicode"
 
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/skiprco/go-utils/v2/errors"
@@ -52,7 +53,7 @@ func SanitizeObject(input interface{}) (genErr *errors.GenericError) {
 	return nil
 }
 
-func sanitizeTraverse(input reflect.Value) {
+func sanitizeTraverse(input reflect.Value) *errors.GenericError {
 	// Unpack if pointer or interface
 	if input.Kind() == reflect.Interface || input.Kind() == reflect.Ptr {
 		input = input.Elem()
@@ -62,5 +63,48 @@ func sanitizeTraverse(input reflect.Value) {
 	switch input.Kind() {
 	case reflect.String:
 		input.SetString(Sanitize(input.String()))
+
+	case reflect.Struct:
+		for i := 0; i < input.NumField(); i++ {
+			name := input.Type().Field(i).Name
+			if isExported(name) {
+				// Field is exported => Continue traversal
+				genErr := sanitizeTraverse(input.Field(i))
+				if genErr != nil {
+					return genErr
+				}
+			}
+		}
+
+	case reflect.Map:
+		genErr := sanitizeMap(input)
+		if genErr != nil {
+			return genErr
+		}
+
+	case reflect.Slice:
+		for i := 0; i < input.Len(); i++ {
+			genErr := sanitizeTraverse(input.Index(i))
+			if genErr != nil {
+				return genErr
+			}
+		}
 	}
+
+	// Traverse succesful
+	return nil
+}
+
+func sanitizeMap(input reflect.Value) *errors.GenericError {
+	return nil
+}
+
+// isExported checks if the provided field name is exported
+// by checking if the first letter is capital
+func isExported(input string) bool {
+	// Based on https://stackoverflow.com/a/30263910
+	for _, rune := range input {
+		return unicode.IsUpper(rune)
+	}
+	return false
 }

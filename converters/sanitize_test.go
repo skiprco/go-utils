@@ -43,3 +43,39 @@ func Test_SanitizeObject_StringPointer(t *testing.T) {
 	require.Nil(t, genErr)
 	assert.Equal(t, expectedPtr, inputPtr)
 }
+
+func Test_SanitizeObject_Struct(t *testing.T) {
+	type Test struct {
+		TestPub  string
+		testPriv string
+	}
+
+	input := Test{
+		TestPub:  "<p>Test</p>",
+		testPriv: "<p>Test</p>",
+	}
+	expected := Test{
+		TestPub:  "Test",
+		testPriv: "<p>Test</p>", // Private fields are unreachable
+	}
+	genErr := SanitizeObject(&input)
+	require.Nil(t, genErr)
+	assert.Equal(t, expected, input)
+}
+
+func Test_SanitizeObject_Slice(t *testing.T) {
+	input := []string{"<p>Test</p>"}
+	expected := []string{"Test"}
+	genErr := SanitizeObject(&input)
+	require.Nil(t, genErr)
+	assert.Equal(t, expected, input)
+}
+
+// func Test_SanitizeObject_Map(t *testing.T) {
+// 	// Should only sanitize map values. Keys should not be touched.
+// 	input := map[string]string{"<p>Test</p>": "<p>Test</p>"}
+// 	expected := map[string]string{"<p>Test</p>": "Test"}
+// 	genErr := SanitizeObject(&input)
+// 	require.Nil(t, genErr)
+// 	assert.Equal(t, expected, input)
+// }
