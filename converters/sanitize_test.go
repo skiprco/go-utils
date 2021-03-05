@@ -82,3 +82,85 @@ func Test_SanitizeObject_Map(t *testing.T) {
 	require.Nil(t, genErr)
 	assert.Equal(t, expected, input)
 }
+
+func Test_SanitizeObject_Complex(t *testing.T) {
+	// Define test specific types and helpers
+	type Item struct {
+		TestString string
+		TestInt    int
+		testPriv   string
+	}
+
+	type Nested struct {
+		Test          string
+		ItemPtr       *Item
+		StringItemMap map[string]Item
+	}
+
+	type Base struct {
+		Nested
+		ItemItemMap map[Item]*Item
+		ItemSlice   []*Item
+	}
+
+	dirtyItem := func() *Item {
+		return &Item{
+			TestString: "<p>Test</p>",
+			TestInt:    8,
+			testPriv:   "<p>Test</p>",
+		}
+	}
+
+	cleanItem := func() *Item {
+		return &Item{
+			TestString: "Test",
+			TestInt:    8,
+			testPriv:   "<p>Test</p>", // Private fields are unreachable
+		}
+	}
+
+	// Define test data
+	input := Base{
+		ItemItemMap: map[Item]*Item{
+			*dirtyItem(): dirtyItem(),
+		},
+		ItemSlice: []*Item{
+			dirtyItem(),
+			dirtyItem(),
+			nil,
+		},
+	}
+	input.Nested = Nested{
+		Test:    "<p>Test</p>",
+		ItemPtr: dirtyItem(),
+		StringItemMap: map[string]Item{
+			"<p>Test</p>": *dirtyItem(),
+			"Test2":       *dirtyItem(),
+		},
+	}
+
+	// Define expected
+	expected := Base{
+		ItemItemMap: map[Item]*Item{
+			*cleanItem(): cleanItem(),
+		},
+		ItemSlice: []*Item{
+			cleanItem(),
+			cleanItem(),
+			nil,
+		},
+	}
+	expected.Nested = Nested{
+		Test:    "Test",
+		ItemPtr: cleanItem(),
+		StringItemMap: map[string]Item{
+			"Test":  *cleanItem(),
+			"Test2": *cleanItem(),
+		},
+	}
+
+	// Call helper and validate result
+	genErr := SanitizeObject(&input)
+	require.Nil(t, genErr)
+	assert.Equal(t, expected, input)
+}

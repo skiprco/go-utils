@@ -114,13 +114,20 @@ func sanitizeMap(input reflect.Value) *errors.GenericError {
 }
 
 func sanitizeCopy(input reflect.Value) reflect.Value {
-	cleaned := reflect.New(input.Type())
+	var cleaned reflect.Value
 	if input.Kind() == reflect.Ptr {
-		cleaned.Elem().Set(input.Elem())
+		cleaned = reflect.New(input.Type())
+		if !input.IsNil() {
+			cleanedValue := reflect.New(input.Elem().Type())
+			cleanedValue.Elem().Set(input.Elem())
+			sanitizeTraverse(cleanedValue)
+			cleaned.Elem().Set(cleanedValue)
+		}
 	} else {
+		cleaned = reflect.New(input.Type())
 		cleaned.Elem().Set(input)
+		sanitizeTraverse(cleaned)
 	}
-	sanitizeTraverse(cleaned)
 	return cleaned.Elem()
 }
 
