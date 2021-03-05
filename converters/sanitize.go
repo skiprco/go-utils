@@ -7,6 +7,7 @@ import (
 	"unicode"
 
 	"github.com/microcosm-cc/bluemonday"
+	log "github.com/sirupsen/logrus"
 	"github.com/skiprco/go-utils/v2/errors"
 )
 
@@ -34,6 +35,7 @@ func SanitizeObject(input interface{}) (genErr *errors.GenericError) {
 	// Validate type of input
 	inputType := reflect.TypeOf(input)
 	if inputType.Kind() != reflect.Ptr {
+		log.WithField("input", input).Error("Provided input to sanitize must be a pointer")
 		meta := map[string]string{"type": inputType.String()}
 		return errors.NewGenericError(500, "go-utils", "common", ErrorInputIsNotPointer, meta)
 	}
@@ -43,6 +45,10 @@ func SanitizeObject(input interface{}) (genErr *errors.GenericError) {
 		if r := recover(); r != nil {
 			meta := map[string]string{"panic": fmt.Sprintf("%v", r)}
 			genErr = errors.NewGenericError(500, "go-utils", "common", ErrorPanicDuringSanitizeObject, meta)
+			log.WithFields(log.Fields{
+				"error": genErr,
+				"input": input,
+			}).Error("Panic thrown during sanitation")
 		}
 	}()
 
