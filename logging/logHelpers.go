@@ -10,6 +10,12 @@ import (
 )
 
 // LogHTTPRequestResponse logs a HTTP request and response. Returns a trace ID to link follow-up logs.
+//
+// Raises
+//
+// - 500/unable_to_dump_request: Failed to dump to HTTP request
+//
+// - 500/unable_to_dump_response: Failed to dump to HTTP response
 func LogHTTPRequestResponse(request *http.Request, response *http.Response, logLevel log.Level, message string) (string, *errors.GenericError) {
 	// Generate trace ID
 	traceID := uuid.New()
@@ -19,7 +25,7 @@ func LogHTTPRequestResponse(request *http.Request, response *http.Response, logL
 	dumpReq, err := httputil.DumpRequest(request, true)
 	if err != nil {
 		traceLog.WithField("error", err).Error("Unable to dump HTTP request")
-		return traceID, errors.NewGenericError(500, "go_utils", "logging", "unable_to_dump_request", nil)
+		return traceID, errors.NewGenericError(500, errorDomain, errorSubDomain, ErrorUnableToDumpRequest, nil)
 	}
 
 	// Response body is already consumed.
@@ -32,7 +38,7 @@ func LogHTTPRequestResponse(request *http.Request, response *http.Response, logL
 		dumpResponseByte, err := httputil.DumpResponse(response, true)
 		if err != nil {
 			traceLog.WithField("error", err).Error("Unable to dump HTTP response")
-			return traceID, errors.NewGenericError(500, "go_utils", "logging", "unable_to_dump_response", nil)
+			return traceID, errors.NewGenericError(500, errorDomain, errorSubDomain, ErrorUnableToDumpResponse, nil)
 		}
 		dumpResponse = string(dumpResponseByte)
 	} else {

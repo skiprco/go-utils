@@ -118,7 +118,7 @@ func Test_Call_400(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "error_during_test", string(body))
 	assert.Equal(t, &responseSample{}, response)
-	errors.AssertGenericError(t, genErr, 400, "response_code_is_error", map[string]string{"response_body": "error_during_test"})
+	errors.AssertGenericError(t, genErr, 400, ErrorResponseCodeIsError, map[string]string{"response_body": "error_during_test"})
 }
 
 func Test_Call_MarshalRequestBodyFailed_Failure(t *testing.T) {
@@ -130,7 +130,7 @@ func Test_Call_MarshalRequestBodyFailed_Failure(t *testing.T) {
 	// Assert results
 	assert.Nil(t, resp)
 	assert.Equal(t, &responseSample{}, response)
-	errors.AssertGenericError(t, genErr, 500, "marshal_request_body_failed", nil)
+	errors.AssertGenericError(t, genErr, 500, ErrorMarshalRequestBodyFailed, nil)
 }
 
 func Test_Call_SendRequestFailed_Failure(t *testing.T) {
@@ -141,7 +141,7 @@ func Test_Call_SendRequestFailed_Failure(t *testing.T) {
 	// Assert results
 	assert.Nil(t, resp)
 	assert.Equal(t, &responseSample{}, response)
-	errors.AssertGenericError(t, genErr, 421, "send_http_request_failed", nil)
+	errors.AssertGenericError(t, genErr, 421, ErrorSendHTTPRequestFailed, nil)
 }
 
 func Test_Call_ParseResponseBodyFailed_Failure(t *testing.T) {
@@ -168,7 +168,7 @@ func Test_Call_ParseResponseBodyFailed_Failure(t *testing.T) {
 	// Assert results
 	assert.Nil(t, resp)
 	assert.Equal(t, &responseSample{}, response)
-	errors.AssertGenericError(t, genErr, 421, "parse_response_body_failed", nil)
+	errors.AssertGenericError(t, genErr, 421, ErrorParseResponseBodyFailed, nil)
 }
 
 // ########################################
@@ -234,5 +234,5 @@ func Test_CallRaw_400(t *testing.T) {
 	body, err := ioutil.ReadAll(resp.Body)
 	assert.Nil(t, err)
 	assert.Equal(t, "error_during_test", string(body))
-	errors.AssertGenericError(t, genErr, 400, "response_code_is_error", nil)
+	errors.AssertGenericError(t, genErr, 400, ErrorResponseCodeIsError, nil)
 }

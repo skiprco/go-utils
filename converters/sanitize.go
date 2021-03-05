@@ -26,9 +26,9 @@ func Sanitize(input string) string {
 //
 // Raises
 //
-// 500/input_is_not_a_pointer: Provided input is not a pointer
+// - 500/input_is_not_a_pointer: Provided input is not a pointer
 //
-// 500/panic_during_sanitize_object: A panic occured during sanitation
+// - 500/panic_during_sanitize_object: A panic occured during sanitation
 func SanitizeObject(input interface{}) (genErr *errors.GenericError) {
 	// Validate type of input
 	inputType := reflect.TypeOf(input)

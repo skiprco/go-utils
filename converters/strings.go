@@ -14,6 +14,10 @@ import (
 
 // NormaliseString removes all the accents from the letters in the string.
 // Based on https://twinnation.org/articles/33/remove-accents-from-characters-in-go
+//
+// Raises
+//
+// - 400/failed_to_normalise_string: Provided country name could not be normalised
 func NormaliseString(input string) (string, *errors.GenericError) {
 	// Normalise string
 	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
@@ -22,7 +26,7 @@ func NormaliseString(input string) (string, *errors.GenericError) {
 	// Handle error
 	if err != nil {
 		log.WithField("input", input).WithField("error", err).Error("Unable to normalise string")
-		return "", errors.NewGenericError(400, "go_utils", "common", "failed_to_normalise_string", nil)
+		return "", errors.NewGenericError(400, errorDomain, errorSubDomain, ErrorFailedToNormaliseString, nil)
 	}
 
 	// Normalise successful
@@ -41,9 +45,12 @@ func ToSnakeCase(input string) string {
 	return strings.ToLower(output)
 }
 
-/*
-CleanSpecialCharacters removes any character(included spaces) which is not a digit or a letter from the input
-*/
+// CleanSpecialCharacters removes any character(included spaces) which is
+// not a digit or a letter from the input.
+//
+// Raises
+//
+// Nothing: This function will never raise an error
 func CleanSpecialCharacters(input string) (string, *errors.GenericError) {
 	normalisedInput, genErr := NormaliseString(input)
 	if genErr != nil {

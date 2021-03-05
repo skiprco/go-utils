@@ -55,7 +55,7 @@ func Call(method string, rootURL string, path string, body interface{}, response
 		bodyBytes, err = json.Marshal(body)
 		if err != nil {
 			defaultLog.WithField("error", err).Error("Failed to marshal request body to JSON")
-			return nil, errors.NewGenericError(500, "go_utils", "common", "marshal_request_body_failed", nil)
+			return nil, errors.NewGenericError(500, errorDomain, errorSubDomain, ErrorMarshalRequestBodyFailed, nil)
 		}
 	}
 
@@ -77,14 +77,14 @@ func Call(method string, rootURL string, path string, body interface{}, response
 	resBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		traceLog.WithField("error", genErr.GetDetailString()).Error("Failed to read response body")
-		return nil, errors.NewGenericError(421, "go_utils", "common", "read_response_body_failed", nil)
+		return nil, errors.NewGenericError(421, errorDomain, errorSubDomain, ErrorReadResponseBodyFailed, nil)
 	}
 
 	// Unmarshal response
 	err = json.Unmarshal(resBody, response)
 	if err != nil {
 		traceLog.WithField("error", err).Error("Failed to parse response body from JSON")
-		return nil, errors.NewGenericError(421, "go_utils", "common", "parse_response_body_failed", nil)
+		return nil, errors.NewGenericError(421, errorDomain, errorSubDomain, ErrorParseResponseBodyFailed, nil)
 	}
 
 	// Return result
@@ -153,7 +153,7 @@ func sendRequest(req *http.Request) (*http.Response, *errors.GenericError) {
 	if err != nil {
 		log.WithField("error", err).Error("Failed to send HTTP request")
 		logging.LogHTTPRequestResponse(req, res, log.ErrorLevel, "Send request failed")
-		return nil, errors.NewGenericError(421, "go_utils", "common", "send_http_request_failed", nil)
+		return nil, errors.NewGenericError(421, errorDomain, errorSubDomain, ErrorSendHTTPRequestFailed, nil)
 	}
 
 	// Dump request for debugging
@@ -178,7 +178,7 @@ func sendRequest(req *http.Request) (*http.Response, *errors.GenericError) {
 			"trace_id": traceID,
 		}).Warn("HTTP response code is error")
 		meta := map[string]string{"response_body": body}
-		return res, errors.NewGenericError(res.StatusCode, "go_utils", "common", "response_code_is_error", meta)
+		return res, errors.NewGenericError(res.StatusCode, errorDomain, errorSubDomain, ErrorResponseCodeIsError, meta)
 
 	// API responded with 2xx Success
 	default:
@@ -196,7 +196,7 @@ func duplicateAndReturnResponseBody(res *http.Response, traceID string) ([]byte,
 			"error":    err,
 			"trace_id": traceID,
 		}).Error("Unable to read HTTP response body")
-		return nil, errors.NewGenericError(500, "go_utils", "common", "read_response_body_failed", nil)
+		return nil, errors.NewGenericError(500, errorDomain, errorSubDomain, ErrorReadResponseBodyFailed, nil)
 	}
 
 	// Replace body with new reader
@@ -212,7 +212,7 @@ func duplicateAndReturnResponseBody(res *http.Response, traceID string) ([]byte,
 func UnwrapResponseCodeIsError(ctx context.Context, genErr *errors.GenericError) (string, map[string]interface{}, bool) {
 	// Return original error if not code "response_code_is_error"
 	auditMeta := map[string]interface{}{}
-	if genErr.SubDomainCode != "response_code_is_error" {
+	if genErr.SubDomainCode != ErrorResponseCodeIsError {
 		return "", auditMeta, false
 	}
 

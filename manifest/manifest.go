@@ -26,6 +26,12 @@ type Manifest struct {
 }
 
 // LoadManifest loads a manifest file from the current directory
+//
+// Raises
+//
+// - 404/manifest_file_not_found: The manifest file is not found or is not readable
+//
+// - 500/unmarshal_manifest_failed: Failed to parse the manifest file as JSON
 func LoadManifest() (*Manifest, *errors.GenericError) {
 	// Setup logging
 	abs, _ := filepath.Abs(ManifestFileName)
@@ -35,7 +41,7 @@ func LoadManifest() (*Manifest, *errors.GenericError) {
 	file, err := ioutil.ReadFile(ManifestFileName)
 	if err != nil {
 		manifestLog.WithField("error", err).Error("Manifest file not found")
-		return nil, errors.NewGenericError(404, "go_utils", "manifest", "manifest_file_not_found", nil)
+		return nil, errors.NewGenericError(404, errorDomain, errorSubDomain, ErrorManifestFileNotFound, nil)
 	}
 
 	// Parse manifest
@@ -43,7 +49,7 @@ func LoadManifest() (*Manifest, *errors.GenericError) {
 	err = json.Unmarshal([]byte(file), manifest)
 	if err != nil {
 		manifestLog.WithField("error", err).Error("Failed to unmarshal manifest file")
-		return nil, errors.NewGenericError(500, "go_utils", "manifest", "unmarshal_manifest_failed", nil)
+		return nil, errors.NewGenericError(500, errorDomain, errorSubDomain, ErrorUnmarshalManifestFailed, nil)
 	}
 
 	// Load manifest successful

@@ -263,15 +263,26 @@ func CountryCodes() map[string]string {
 }
 
 // CountryCodeToCountryName converts a country code to a country's name
+//
+// Raises
+//
+// - 404/country_not_found: Provided country code was not found
 func CountryCodeToCountryName(countryCode string) (string, *errors.GenericError) {
 	name, exists := CountryCodes()[countryCode]
 	if !exists {
-		return "", errors.NewGenericError(404, "go_utils", "common", "country_not_found", nil)
+		meta := map[string]string{"code": countryCode}
+		return "", errors.NewGenericError(404, errorDomain, errorSubDomain, ErrorCountryNotFound, meta)
 	}
 	return name, nil
 }
 
 // CountryNameToCountryCode converts a country name to a country's code, ignoring casing and accents
+//
+// Raises
+//
+// - 400/failed_to_normalise_string: Provided country name could not be normalised
+//
+// - 404/country_not_found: Provided country was not found
 func CountryNameToCountryCode(countryName string) (string, *errors.GenericError) {
 	// Clean input name
 	cleanName, genErr := NormaliseString(countryName)
@@ -286,5 +297,6 @@ func CountryNameToCountryCode(countryName string) (string, *errors.GenericError)
 			return code, nil
 		}
 	}
-	return "", errors.NewGenericError(404, "go_utils", "common", "country_not_found", nil)
+	meta := map[string]string{"name": countryName}
+	return "", errors.NewGenericError(404, errorDomain, errorSubDomain, ErrorCountryNotFound, meta)
 }
