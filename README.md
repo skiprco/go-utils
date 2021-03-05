@@ -94,6 +94,15 @@ output := converters.ToSnakeCase("ThisIS_a-veryRandom_string") // output == "thi
 
 // Removes any character(included spaces) which is not a digit or a letter from a string
 output := converters.CleanSpecialCharacters("dir.ty-Str*in//g :)") // output == "dirtyString"
+
+// Sanitize removes all HTML tags from the input and escapes entities.
+// Following entities are excluded from escaping: &, ' (apos)
+output := converters.Sanitize("<p>Test</p>") // output == "Test"
+
+// SanitizeObject takes a pointer to an object (struct, map, slice, ...) as input
+// and runs Sanitize for each field which is a (pointer to a) string.
+test := map[string]string{"<p>Key</p>": "<p>Value</p>"}
+converters.SanitizeObject(&test) // test == map[string]string{"Key": "Value"}
 ```
 
 ### Errors
