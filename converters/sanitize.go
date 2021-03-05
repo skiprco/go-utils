@@ -16,7 +16,7 @@ func Sanitize(input string) string {
 	// Sanitize input
 	output := bluemonday.StrictPolicy().Sanitize(input)
 
-	// Restore characters which shouldn't pose a threat
+	// Restore some characters
 	output = strings.ReplaceAll(output, "&#39;", "'")
 	return strings.ReplaceAll(output, "&amp;", "&")
 }
@@ -53,6 +53,7 @@ func SanitizeObject(input interface{}) (genErr *errors.GenericError) {
 	return nil
 }
 
+// sanitizeTraverse is a recursive function which sanitizes each child of the provided input
 func sanitizeTraverse(input reflect.Value) *errors.GenericError {
 	// Unpack if pointer or interface
 	if input.Kind() == reflect.Interface || input.Kind() == reflect.Ptr {
@@ -113,6 +114,11 @@ func sanitizeMap(input reflect.Value) *errors.GenericError {
 	return nil
 }
 
+// sanitizeCopy takes a Value which has "CanSet() == false",
+// makes a copy, sanitizes the copy and returns this copy.
+//
+// This is needed when you want to sanitize e.g. a value from a map.
+// See https://golang.org/pkg/reflect/#Value.CanSet for more info.
 func sanitizeCopy(input reflect.Value) reflect.Value {
 	var cleaned reflect.Value
 	if input.Kind() == reflect.Ptr {
