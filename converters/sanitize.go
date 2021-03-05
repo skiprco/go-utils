@@ -96,7 +96,32 @@ func sanitizeTraverse(input reflect.Value) *errors.GenericError {
 }
 
 func sanitizeMap(input reflect.Value) *errors.GenericError {
+	for _, k := range input.MapKeys() {
+		// Clean copy of key and value
+		cleanedKey := sanitizeCopy(k)
+		value := input.MapIndex(k)
+		cleanedValue := sanitizeCopy(value)
+
+		// Delete old key from map
+		input.SetMapIndex(k, reflect.Value{})
+
+		// Write new key/value to map
+		input.SetMapIndex(cleanedKey, cleanedValue)
+	}
+
+	// Sanitize successful
 	return nil
+}
+
+func sanitizeCopy(input reflect.Value) reflect.Value {
+	cleaned := reflect.New(input.Type())
+	if input.Kind() == reflect.Ptr {
+		cleaned.Elem().Set(input.Elem())
+	} else {
+		cleaned.Elem().Set(input)
+	}
+	sanitizeTraverse(cleaned)
+	return cleaned.Elem()
 }
 
 // isExported checks if the provided field name is exported
