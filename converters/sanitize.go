@@ -34,14 +34,14 @@ func SanitizeObject(input interface{}) (genErr *errors.GenericError) {
 	inputType := reflect.TypeOf(input)
 	if inputType.Kind() != reflect.Ptr {
 		meta := map[string]string{"type": inputType.String()}
-		return errors.NewGenericError(500, "go-utils", "common", "input_is_not_a_pointer", meta)
+		return errors.NewGenericError(500, "go-utils", "common", ErrorInputIsNotPointer, meta)
 	}
 
 	// Convert panic to correct error
 	defer func() {
 		if r := recover(); r != nil {
 			meta := map[string]string{"panic": fmt.Sprintf("%v", r)}
-			genErr = errors.NewGenericError(500, "go-utils", "common", "panic_during_sanitize_object", meta)
+			genErr = errors.NewGenericError(500, "go-utils", "common", ErrorPanicDuringSanitizeObject, meta)
 		}
 	}()
 
