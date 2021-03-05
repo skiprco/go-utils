@@ -23,7 +23,7 @@ func GetUserIDFromGoMicroMeta(ctx context.Context, errorDomain string) (string, 
 	// Validate if user ID is set
 	userID := meta.Get("user_id")
 	if userID == "" {
-		return "", meta, errors.NewGenericError(500, errorDomain, "common", ErrorUserIDNotInMeta, nil)
+		return "", meta, errors.NewGenericError(500, errorDomain, errorSubDomain, ErrorUserIDNotInMeta, nil)
 	}
 
 	return userID, meta, nil

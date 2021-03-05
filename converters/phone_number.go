@@ -1,14 +1,17 @@
 package converters
 
 import (
-	"github.com/skiprco/go-utils/v2/errors"
 	"regexp"
+
+	"github.com/skiprco/go-utils/v2/errors"
 )
 
-/**
-CleanPhoneNumber remove all non necessary code of a phone number
-Be aware that remove all non numeric char except the sign '+'
-*/
+// CleanPhoneNumber remove all non necessary code of a phone number
+// Be aware that remove all non numeric char except the sign '+'
+//
+// Raises
+//
+// Nothing: This function will never raise an error
 func CleanPhoneNumber(phoneNumber string) (string, *errors.GenericError) {
 	regExpression := regexp.MustCompile(`[^\+\d]`)
 	return regExpression.ReplaceAllLiteralString(phoneNumber, ""), nil

@@ -18,12 +18,12 @@ func TestFormatPhoneNumber(t *testing.T) {
 		{"well formatted phone number BE without passing country code", "+32468300431", "", "+32468300431", ""},
 		{"Valid phone number FR", "06 23 83 96 79", "FR", "+33623839679", ""},
 		{"Valid phone number but not correctly formatted", "0468300431", "BE", "+32468300431", ""},
-		{"Valid phone number but not correctly formatted without passing country code", "0468300431", "", "", "invalid_country_code"},
-		{"Not Valid phone number", "0461", "BE", "", "invalid_phone_number"},
-		{"Valid phone number but not a mobile", "+3227896143", "BE", "", "not_a_mobile_phone_number"},
-		{"Not a phone number at all", "dhjdhj", "BE", "", "not_a_phone_number"},
-		{"Not a phone number at all without country code", "+324ER3643", "", "", "invalid_phone_number"},
-		{"Invalid phone number without country code", "+324780000012", "", "", "invalid_phone_number"},
+		{"Valid phone number but not correctly formatted without passing country code", "0468300431", "", "", ErrorInvalidCountryCode},
+		{"Not Valid phone number", "0461", "BE", "", ErrorInvalidPhoneNumber},
+		{"Valid phone number but not a mobile", "+3227896143", "BE", "", ErrorNotAMobilePhoneNumber},
+		{"Not a phone number at all", "dhjdhj", "BE", "", ErrorNotAPhoneNumber},
+		{"Not a phone number at all without country code", "+324ER3643", "", "", ErrorInvalidPhoneNumber},
+		{"Invalid phone number without country code", "+324780000012", "", "", ErrorInvalidPhoneNumber},
 	}
 
 	for _, tt := range tests {

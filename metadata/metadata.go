@@ -85,6 +85,10 @@ func (meta Metadata) ToBase64() string {
 }
 
 // FromBase64 creates a metadata model from its base64 string equivalent
+//
+// Raises
+//
+// - 400/decode_glob_from_base64_failed: Failed to decode the metadata as glob from the provided base64 string
 func FromBase64(data string) (Metadata, *errors.GenericError) {
 	// Return empty metadata object when no data is provided
 	if data == "" {
@@ -95,7 +99,7 @@ func FromBase64(data string) (Metadata, *errors.GenericError) {
 	metaGob, err := base64.StdEncoding.DecodeString(data)
 	if err != nil {
 		log.WithField("error", err).WithField("data", data).Error("Failed to decode Gob bytes from base64 string")
-		return nil, errors.NewGenericError(400, errDomain, errSubDomain, "decode_glob_from_base64_failed", nil)
+		return nil, errors.NewGenericError(400, errDomain, errSubDomain, ErrorDecodeGlobFromBase64Failed, nil)
 	}
 
 	// Decode from binary to Metadata

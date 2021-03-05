@@ -63,5 +63,6 @@ func Test_AddAuditInfo_ServiceNameNotSet(t *testing.T) {
 
 	// Assert results
 	assert.NotNil(t, ctx)
-	errors.AssertGenericError(t, genErr, 500, "service_name_not_found_in_context", nil)
+	meta := map[string]string{"key": "service_name"}
+	errors.AssertGenericError(t, genErr, 500, "key_not_found_in_context", meta)
 }

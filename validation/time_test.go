@@ -50,6 +50,6 @@ func Test_WithinTimeRange_EndBeforeStart_Failure(t *testing.T) {
 	start := now.Add(time.Hour)
 	end := now
 	within, genErr := WithinTimeRange(now, start, end)
-	errors.AssertGenericError(t, genErr, 400, "end_time_before_start_time", nil)
+	errors.AssertGenericError(t, genErr, 400, ErrorEndTimeBeforeStartTime, nil)
 	assert.False(t, within)
 }
