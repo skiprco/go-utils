@@ -11,13 +11,14 @@ import (
 )
 
 // Sanitize removes all HTML tags from the input and escapes entities.
-// Following entities are excluded from escaping: &, ' (apos)
+// Following entities are excluded from escaping: ' (apos), " (quote), &
 func Sanitize(input string) string {
 	// Sanitize input
 	output := bluemonday.StrictPolicy().Sanitize(input)
 
 	// Restore some characters
 	output = strings.ReplaceAll(output, "&#39;", "'")
+	output = strings.ReplaceAll(output, "&#34;", `"`)
 	return strings.ReplaceAll(output, "&amp;", "&")
 }
 
