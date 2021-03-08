@@ -2,7 +2,10 @@ package mongo
 
 import (
 	"context"
+	"reflect"
+
 	log "github.com/sirupsen/logrus"
+	"github.com/skiprco/go-utils/v2/converters"
 	"github.com/skiprco/go-utils/v2/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -79,7 +82,26 @@ func (r *mongoRepository) getCollection(collectionName string) (*mongo.Collectio
 // Save the entity. Try to find the entity by entityId on the field _id of the mongo collections.
 // If there is a match, the entity is updated. If not, the entity is create
 // the methodName parameter is used for logging / error
+//
+// Raises
+//
+// - 500/panic_during_sanitize_object: A panic occured during sanitation
+//
+// - 500/can_t_create_entity: Mongo library returned an error while doing an upsert
 func (r *mongoRepository) Save(ctx context.Context, collectionName string, entity interface{}, entityId interface{}, methodName string) *errors.GenericError {
+	// Sanitize entity
+	if reflect.TypeOf(entity).Kind() != reflect.Ptr {
+		// Convert interface{obj} to interface{&obj}
+		// Based on https://stackoverflow.com/a/51219342
+		entityPtr := reflect.New(reflect.TypeOf(entity))
+		entityPtr.Elem().Set(reflect.ValueOf(entity))
+		entity = entityPtr.Interface()
+	}
+	genErr := converters.SanitizeObject(entity)
+	if genErr != nil {
+		return genErr
+	}
+
 	collection, genErr := r.getCollection(collectionName)
 	if genErr != nil {
 		return genErr

@@ -7,22 +7,29 @@ import (
 	"unicode"
 
 	"github.com/microcosm-cc/bluemonday"
+	log "github.com/sirupsen/logrus"
 	"github.com/skiprco/go-utils/v2/errors"
 )
 
 // Sanitize removes all HTML tags from the input and escapes entities.
-// Following entities are excluded from escaping: &, ' (apos)
+// Following entities are excluded from escaping: ' (apos), " (quote), &
 func Sanitize(input string) string {
 	// Sanitize input
 	output := bluemonday.StrictPolicy().Sanitize(input)
 
 	// Restore some characters
 	output = strings.ReplaceAll(output, "&#39;", "'")
+	output = strings.ReplaceAll(output, "&#34;", `"`)
 	return strings.ReplaceAll(output, "&amp;", "&")
 }
 
 // SanitizeObject takes a pointer to an object (struct, map, slice, ...) as input
 // and runs Sanitize for each field which is a (pointer to a) string.
+//
+// Note: A pointer to an interface with a non-pointer struct value "&interface{obj}" is
+// not supported. In this case you should convert it to an interface with a pointer
+// to a struct value "interface{&obj}" before calling this helper.
+// See "mongo.Save" for an example how to convert between these two.
 //
 // Raises
 //
@@ -33,6 +40,7 @@ func SanitizeObject(input interface{}) (genErr *errors.GenericError) {
 	// Validate type of input
 	inputType := reflect.TypeOf(input)
 	if inputType.Kind() != reflect.Ptr {
+		log.WithField("input", input).Error("Provided input to sanitize must be a pointer")
 		meta := map[string]string{"type": inputType.String()}
 		return errors.NewGenericError(500, "go-utils", "common", ErrorInputIsNotPointer, meta)
 	}
@@ -42,6 +50,10 @@ func SanitizeObject(input interface{}) (genErr *errors.GenericError) {
 		if r := recover(); r != nil {
 			meta := map[string]string{"panic": fmt.Sprintf("%v", r)}
 			genErr = errors.NewGenericError(500, "go-utils", "common", ErrorPanicDuringSanitizeObject, meta)
+			log.WithFields(log.Fields{
+				"error": genErr,
+				"input": input,
+			}).Error("Panic thrown during sanitation")
 		}
 	}()
 
@@ -55,7 +67,7 @@ func SanitizeObject(input interface{}) (genErr *errors.GenericError) {
 
 // sanitizeTraverse is a recursive function which sanitizes each child of the provided input
 func sanitizeTraverse(input reflect.Value) *errors.GenericError {
-	// Unpack if pointer or interface
+	// Unpack if interface or pointer
 	if input.Kind() == reflect.Interface || input.Kind() == reflect.Ptr {
 		input = input.Elem()
 	}
