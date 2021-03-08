@@ -90,12 +90,14 @@ func (r *mongoRepository) getCollection(collectionName string) (*mongo.Collectio
 // - 500/can_t_create_entity: Mongo library returned an error while doing an upsert
 func (r *mongoRepository) Save(ctx context.Context, collectionName string, entity interface{}, entityId interface{}, methodName string) *errors.GenericError {
 	// Sanitize entity
-	var genErr *errors.GenericError = nil
-	if reflect.TypeOf(entity).Kind() == reflect.Ptr {
-		genErr = converters.SanitizeObject(entity)
-	} else {
-		genErr = converters.SanitizeObject(&entity)
+	if reflect.TypeOf(entity).Kind() != reflect.Ptr {
+		// Convert interface{obj} to interface{&obj}
+		// Based on https://stackoverflow.com/a/51219342
+		entityPtr := reflect.New(reflect.TypeOf(entity))
+		entityPtr.Elem().Set(reflect.ValueOf(entity))
+		entity = entityPtr.Interface()
 	}
+	genErr := converters.SanitizeObject(entity)
 	if genErr != nil {
 		return genErr
 	}

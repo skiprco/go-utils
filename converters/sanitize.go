@@ -62,7 +62,7 @@ func SanitizeObject(input interface{}) (genErr *errors.GenericError) {
 
 // sanitizeTraverse is a recursive function which sanitizes each child of the provided input
 func sanitizeTraverse(input reflect.Value) *errors.GenericError {
-	// Unpack if pointer or interface
+	// Unpack if interface or pointer
 	if input.Kind() == reflect.Interface || input.Kind() == reflect.Ptr {
 		input = input.Elem()
 	}
