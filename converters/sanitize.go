@@ -26,6 +26,11 @@ func Sanitize(input string) string {
 // SanitizeObject takes a pointer to an object (struct, map, slice, ...) as input
 // and runs Sanitize for each field which is a (pointer to a) string.
 //
+// Note: A pointer to an interface with a non-pointer struct value "&interface{obj}" is
+// not supported. In this case you should convert it to an interface with a pointer
+// to a struct value "interface{&obj}" before calling this helper.
+// See "mongo.Save" for an example how to convert between these two.
+//
 // Raises
 //
 // - 500/input_is_not_a_pointer: Provided input is not a pointer
