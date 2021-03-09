@@ -5,16 +5,18 @@ Common utils for Golang
 ### Import
 ```go
 import (
-    "github.com/skiprco/go-utils/auth"
-    "github.com/skiprco/go-utils/collections"
-    "github.com/skiprco/go-utils/converters"
-    "github.com/skiprco/go-utils/errors"
-    "github.com/skiprco/go-utils/gin"
-    "github.com/skiprco/go-utils/http"
-    "github.com/skiprco/go-utils/logging"
-    "github.com/skiprco/go-utils/manifest"
-    "github.com/skiprco/go-utils/metadata"
-    "github.com/skiprco/go-utils/validation"
+    "github.com/skiprco/go-utils/v2/auth"
+    "github.com/skiprco/go-utils/v2/collections"
+    "github.com/skiprco/go-utils/v2/converters"
+    "github.com/skiprco/go-utils/v2/errors"
+    "github.com/skiprco/go-utils/v2/gin"
+    "github.com/skiprco/go-utils/v2/http"
+    "github.com/skiprco/go-utils/v2/logging"
+    "github.com/skiprco/go-utils/v2/manifest"
+    "github.com/skiprco/go-utils/v2/metadata"
+    "github.com/skiprco/go-utils/v2/mongo"
+    "github.com/skiprco/go-utils/v2/test"
+    "github.com/skiprco/go-utils/v2/validation"
 )
 ```
 
@@ -251,30 +253,7 @@ func SetGoMicroMetadata(ctx context.Context, key string, value string) (context.
 func ConvertGinToGoMicro(c *gin.Context) context.Context {}
 ```
 
-### Validation
-
-#### Country code
-```go
-// Checks if a country code is valid. An empty code is considered valid as well.
-valid := validation.ValidateCountryCode("BE") // valid == true
-```
-
-#### Country code
-```go
-// ValidateAndFormatPhoneNumber checks if the provided phone number is valid.
-// If yes, it will format it to its E164 representation (e.g +32...)
-number, genErr := validation.ValidateAndFormatPhoneNumber("+32 478 12 34 56") // number == "+32478123456"
-```
-
-#### Time
-```go
-// WithinTimeRange checks if the "nowTime" lies between "startTime" (including) and "endTime" (excluding).
-now := time.Now()
-start := now.Add(-time.Hour)
-end := now.Add(time.Hour)
-within, genErr := validation.WithinTimeRange(now, start, end) // within = true
-```
-### mongo
+### Mongo
 ```go
 // init mongo client & collection
 repo, genErr := repository.NewMongoRepository(context.Background(), "mongoAddress", "mongoDBName", []string{"CollectionName"})
@@ -310,4 +289,48 @@ genErr := repo.GetMultiple(ctx, "CollectionName", query, results,"functionName")
 // Save & delete
 repo.Save(ctx, "CollectionName", myEntity, myEntity.Id, "functionName")
 repo.Delete(ctx, "CollectionName", myEntity.Id, "functionName")
+```
+
+### Test
+
+Package test contains helpers to simplify testing.
+It's called `test` to prevent collision with standard package `testing`.
+
+```go
+// ReplaceMockReturnArgs replaces the returned arguments for an existing mock.
+// This is useful for overwriting a happy mocked call.
+func ReplaceMockReturnArgs(t *testing.T, mockObject *mock.Mock, methodName string, newArgs ...interface{}) {}
+
+// LimitMockCallCount limits the number of calls the mock will respond to (See Once(), Times(), ...)
+func LimitMockCallCount(t *testing.T, mockObject *mock.Mock, methodName string, callCount int) {}
+
+// FindMockCallByMethod searches a call inside a mock (defined by ".On(...)")
+// and returns a pointer to it. If possible, please use "ReplaceMockReturnArgs"
+// or "LimitMockCallCount" instead. Since calling ".On(...)" on the returned
+// call won't likely have the expected result.
+func FindMockCallByMethod(t *testing.T, mockObject *mock.Mock, methodName string) *mock.Call {}
+```
+
+### Validation
+
+#### Country code
+```go
+// Checks if a country code is valid. An empty code is considered valid as well.
+valid := validation.ValidateCountryCode("BE") // valid == true
+```
+
+#### Country code
+```go
+// ValidateAndFormatPhoneNumber checks if the provided phone number is valid.
+// If yes, it will format it to its E164 representation (e.g +32...)
+number, genErr := validation.ValidateAndFormatPhoneNumber("+32 478 12 34 56") // number == "+32478123456"
+```
+
+#### Time
+```go
+// WithinTimeRange checks if the "nowTime" lies between "startTime" (including) and "endTime" (excluding).
+now := time.Now()
+start := now.Add(-time.Hour)
+end := now.Add(time.Hour)
+within, genErr := validation.WithinTimeRange(now, start, end) // within = true
 ```
