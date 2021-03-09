@@ -3,7 +3,7 @@ package errors
 import (
 	"testing"
 
-	microErrors "github.com/micro/go-micro/v2/errors"
+	microErrors "github.com/asim/go-micro/v3/errors"
 	"github.com/stretchr/testify/assert"
 )
 

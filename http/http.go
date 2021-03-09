@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/skiprco/go-utils/v2/errors"
-	"github.com/skiprco/go-utils/v2/logging"
+	"github.com/skiprco/go-utils/v3/errors"
+	"github.com/skiprco/go-utils/v3/logging"
 )
 
 // Call marshals the body to JSON and sends a HTTP request. Response is parsed as JSON.

@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
-	microErrors "github.com/micro/go-micro/v2/errors"
+	microErrors "github.com/asim/go-micro/v3/errors"
 	log "github.com/sirupsen/logrus"
-	"github.com/skiprco/go-utils/v2/collections"
+	"github.com/skiprco/go-utils/v3/collections"
 )
 
 // NewGenericError creates a new generic error.

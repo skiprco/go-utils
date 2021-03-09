@@ -9,8 +9,8 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/skiprco/go-utils/v2/converters"
-	"github.com/skiprco/go-utils/v2/metadata"
+	"github.com/skiprco/go-utils/v3/converters"
+	"github.com/skiprco/go-utils/v3/metadata"
 )
 
 // ========================================

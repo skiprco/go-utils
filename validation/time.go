@@ -3,7 +3,7 @@ package validation
 import (
 	"time"
 
-	"github.com/skiprco/go-utils/v2/errors"
+	"github.com/skiprco/go-utils/v3/errors"
 )
 
 // WithinTimeRange checks if the "nowTime" is between "startTime" (including) and "endTime" (excluding).

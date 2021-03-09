@@ -5,18 +5,18 @@ Common utils for Golang
 ### Import
 ```go
 import (
-    "github.com/skiprco/go-utils/v2/auth"
-    "github.com/skiprco/go-utils/v2/collections"
-    "github.com/skiprco/go-utils/v2/converters"
-    "github.com/skiprco/go-utils/v2/errors"
-    "github.com/skiprco/go-utils/v2/gin"
-    "github.com/skiprco/go-utils/v2/http"
-    "github.com/skiprco/go-utils/v2/logging"
-    "github.com/skiprco/go-utils/v2/manifest"
-    "github.com/skiprco/go-utils/v2/metadata"
-    "github.com/skiprco/go-utils/v2/mongo"
-    "github.com/skiprco/go-utils/v2/test"
-    "github.com/skiprco/go-utils/v2/validation"
+    "github.com/skiprco/go-utils/v3/auth"
+    "github.com/skiprco/go-utils/v3/collections"
+    "github.com/skiprco/go-utils/v3/converters"
+    "github.com/skiprco/go-utils/v3/errors"
+    "github.com/skiprco/go-utils/v3/gin"
+    "github.com/skiprco/go-utils/v3/http"
+    "github.com/skiprco/go-utils/v3/logging"
+    "github.com/skiprco/go-utils/v3/manifest"
+    "github.com/skiprco/go-utils/v3/metadata"
+    "github.com/skiprco/go-utils/v3/mongo"
+    "github.com/skiprco/go-utils/v3/test"
+    "github.com/skiprco/go-utils/v3/validation"
 )
 ```
 
@@ -272,7 +272,7 @@ result := &myEntityStruct{}
 genErr := repo.GetOne(ctx, "CollectionName", query, true, result,"functionName")
 if genErr != nil {
     // manage genErr
-    
+
 }
 // result is populate from database information
 if result.Id != "" {

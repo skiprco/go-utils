@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/skiprco/go-utils/v2/errors"
-	"github.com/skiprco/go-utils/v2/logging"
+	"github.com/skiprco/go-utils/v3/errors"
+	"github.com/skiprco/go-utils/v3/logging"
 )
 
 // IsOverride checks if the provided user ID has a prefix to override the authentication.

@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/skiprco/go-utils/v2/errors"
+	"github.com/skiprco/go-utils/v3/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -7,8 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/pborman/uuid"
-	"github.com/skiprco/go-utils/v2/logging"
-	"github.com/skiprco/go-utils/v2/metadata"
+	"github.com/skiprco/go-utils/v3/logging"
+	"github.com/skiprco/go-utils/v3/metadata"
 )
 
 // AuditMiddleware logs the attempt and result for an API call.

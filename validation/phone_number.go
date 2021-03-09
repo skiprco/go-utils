@@ -2,7 +2,7 @@ package validation
 
 import (
 	"github.com/nyaruka/phonenumbers"
-	"github.com/skiprco/go-utils/v2/errors"
+	"github.com/skiprco/go-utils/v3/errors"
 )
 
 const phoneNumberInvalidCountryCodeMessage = "invalid country code"

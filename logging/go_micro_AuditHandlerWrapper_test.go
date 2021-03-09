@@ -5,13 +5,13 @@ import (
 	goErrors "errors"
 	"testing"
 
-	"github.com/micro/go-micro/v2/codec"
-	microMetadata "github.com/micro/go-micro/v2/metadata"
-	"github.com/micro/go-micro/v2/server"
+	"github.com/asim/go-micro/v3/codec"
+	microMetadata "github.com/asim/go-micro/v3/metadata"
+	"github.com/asim/go-micro/v3/server"
 	"github.com/sirupsen/logrus"
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	"github.com/skiprco/go-utils/v2/errors"
-	"github.com/skiprco/go-utils/v2/metadata"
+	"github.com/skiprco/go-utils/v3/errors"
+	"github.com/skiprco/go-utils/v3/metadata"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

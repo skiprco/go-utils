@@ -5,8 +5,8 @@ import (
 	"reflect"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/skiprco/go-utils/v2/converters"
-	"github.com/skiprco/go-utils/v2/errors"
+	"github.com/skiprco/go-utils/v3/converters"
+	"github.com/skiprco/go-utils/v3/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"

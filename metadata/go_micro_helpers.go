@@ -3,7 +3,7 @@ package metadata
 import (
 	"context"
 
-	"github.com/skiprco/go-utils/v2/errors"
+	"github.com/skiprco/go-utils/v3/errors"
 )
 
 // GetUserIDFromGoMicroMeta extracts the user ID from the metadata of go-micro

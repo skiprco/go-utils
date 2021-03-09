@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/micro/go-micro/v2/metadata"
-	"github.com/skiprco/go-utils/v2/errors"
+	"github.com/asim/go-micro/v3/metadata"
+	"github.com/skiprco/go-utils/v3/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

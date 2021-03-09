@@ -8,7 +8,7 @@ import (
 
 	"github.com/microcosm-cc/bluemonday"
 	log "github.com/sirupsen/logrus"
-	"github.com/skiprco/go-utils/v2/errors"
+	"github.com/skiprco/go-utils/v3/errors"
 )
 
 // Sanitize removes all HTML tags from the input and escapes entities.

@@ -6,7 +6,7 @@ import (
 	"unicode"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/skiprco/go-utils/v2/errors"
+	"github.com/skiprco/go-utils/v3/errors"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"

@@ -1,6 +1,6 @@
 package logging
 
-import "github.com/skiprco/go-utils/v2/metadata"
+import "github.com/skiprco/go-utils/v3/metadata"
 
 func fixtureMetadata() metadata.Metadata {
 	return metadata.Metadata{

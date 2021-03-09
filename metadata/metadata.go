@@ -6,7 +6,7 @@ import (
 	"encoding/gob"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/skiprco/go-utils/v2/errors"
+	"github.com/skiprco/go-utils/v3/errors"
 )
 
 // ========================================

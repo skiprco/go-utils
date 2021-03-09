@@ -1,6 +1,6 @@
 package auth
 
-import "github.com/skiprco/go-utils/v2/errors"
+import "github.com/skiprco/go-utils/v3/errors"
 
 // HasRole checks if the provided roles is included in the user roles.
 // This role might be granted implicitely (e.g. OPERATOR_READ on OPERATOR_ADMIN).

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	microErrors "github.com/micro/go-micro/v2/errors"
+	microErrors "github.com/asim/go-micro/v3/errors"
 )
 
 // GenericError provides a structured output for easy use in the front end

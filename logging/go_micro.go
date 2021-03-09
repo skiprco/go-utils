@@ -4,11 +4,11 @@ import (
 	"context"
 	"strings"
 
-	"github.com/micro/go-micro/v2/server"
+	"github.com/asim/go-micro/v3/server"
 	log "github.com/sirupsen/logrus"
-	"github.com/skiprco/go-utils/v2/converters"
-	"github.com/skiprco/go-utils/v2/errors"
-	"github.com/skiprco/go-utils/v2/metadata"
+	"github.com/skiprco/go-utils/v3/converters"
+	"github.com/skiprco/go-utils/v3/errors"
+	"github.com/skiprco/go-utils/v3/metadata"
 )
 
 // AuditHandlerWrapper injects the service's name and called endpoint into the context.

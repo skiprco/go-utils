@@ -2,7 +2,7 @@ package metadata
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/skiprco/go-utils/v2/collections"
+	"github.com/skiprco/go-utils/v3/collections"
 )
 
 // GinMetadataKey is the key which is used to store metadata on the Gin context

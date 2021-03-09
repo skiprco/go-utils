@@ -3,7 +3,7 @@ package converters
 import (
 	"regexp"
 
-	"github.com/skiprco/go-utils/v2/errors"
+	"github.com/skiprco/go-utils/v3/errors"
 )
 
 // CleanPhoneNumber remove all non necessary code of a phone number
