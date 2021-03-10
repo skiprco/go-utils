@@ -107,6 +107,20 @@ test := map[string]string{"<p>Key</p>": "<p>Value</p>"}
 converters.SanitizeObject(&test) // test == map[string]string{"Key": "Value"}
 ```
 
+#### Currency
+```go
+// convert a value in cent to a human readable price
+output, _ := converters.ConvertCentToCurrency(200, "EUR", "") // output == "2.00 €"
+// !! all currencies are not fully implemented
+```
+
+#### Date
+```go
+// convert a date in ISO format to an human readable date
+output, _ := ConvertToDate("2019-06-17T13:25:54.831Z", "EN") // output == "17/06/19"
+// !! all the language are not fully implemented
+```
+
 ### Errors
 ```go
 // Create an error with metadata
