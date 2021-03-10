@@ -1,7 +1,6 @@
 package converters
 
 import (
-	"github.com/aws/aws-sdk-go/private/protocol"
 	"github.com/skiprco/go-utils/v2/errors"
 	"time"
 )
@@ -10,10 +9,10 @@ import (
 // sadly there is currently no go library to manage that. Probably not the best way to do that, but it should works until
 // Skipr a transcontinental company
 var dateFormats = map[string]dateFormat{
-	"FR":      {date: "02/01/06"},
-	"NL":      {date: "02-01-06"},
-	"EN":      {date: "02/01/06"},
-	"DEFAULT": {date: "02/01/06"},
+	"FR":      {date: "02/01/2006"},
+	"NL":      {date: "02-01-2006"},
+	"EN":      {date: "02/01/2006"},
+	"DEFAULT": {date: "02/01/2006"},
 }
 
 type dateFormat struct {
@@ -31,7 +30,7 @@ func ConvertToDate(date, lang string) (string, *errors.GenericError) {
 		format = dateFormats["DEFAULT"]
 	}
 	printer := getPrinter(lang)
-	t, err := time.Parse(protocol.ISO8601TimeFormat, date)
+	t, err := time.Parse(time.RFC3339, date)
 	if err != nil {
 		meta := map[string]string{
 			"date": date,

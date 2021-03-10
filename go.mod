@@ -3,10 +3,7 @@ module github.com/skiprco/go-utils/v2
 go 1.14
 
 require (
-	github.com/aws/aws-sdk-go v1.34.28
 	github.com/gin-gonic/gin v1.6.3
-	github.com/klauspost/lctime v0.1.0
-	github.com/leekchan/accounting v1.0.0 // indirect
 	github.com/micro/go-micro/v2 v2.7.0
 	github.com/microcosm-cc/bluemonday v1.0.4
 	github.com/nyaruka/phonenumbers v1.0.60

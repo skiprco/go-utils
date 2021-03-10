@@ -7,13 +7,13 @@ import (
 )
 
 func Test_ConvertCentimeWithEnLanguageAndUSD_success(t *testing.T) {
-	result, genErr := ConvertCentToCurrency(200, "USD", "EN")
+	result, genErr := ConvertCentToCurrency(200, "USD", "en")
 	assert.Nil(t, genErr)
 	assert.Equal(t, "$2.00", result)
 }
 
 func Test_ConvertCentimeWithFRLanguageAndEUR_success(t *testing.T) {
-	result, genErr := ConvertCentToCurrency(200, "EUR", "FR")
+	result, genErr := ConvertCentToCurrency(200, "EUR", "fr")
 	assert.Nil(t, genErr)
 	assert.Equal(t, "2,00 €", result)
 }
@@ -25,7 +25,7 @@ func Test_ConvertCentimeWithUnknownLanguageAndEUR_success(t *testing.T) {
 }
 
 func Test_ConvertCentimeWithUnknownCurrency_failed500(t *testing.T) {
-	result, genErr := ConvertCentToCurrency(200, "OOO", "FR")
+	result, genErr := ConvertCentToCurrency(200, "OOO", "fr")
 	assert.NotNil(t, errors.NewGenericError(400, errorDomain, errorSubDomain, ErrorUnknownCurrency, map[string]string{"currency": "OOO"}), genErr)
 	assert.Equal(t, "", result)
 }

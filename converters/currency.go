@@ -6,8 +6,8 @@ import (
 
 // ConvertCentToCurrency converts a cent value into a human readable price with the expected currency
 // decimal are managed by the expected lang
-// lang should have the 2 letters ISO format ("FR", "EN"). If the language is not found or empty, use English
-// the currency should be the ISO 4217 format ('EUR','USE'). If the currency doesn't implemented yet, return an error unknown_currency
+// lang should have the ISO 639-1 format ("fr", "en"). If the language is not found or empty, use English
+// the currency should be the ISO 4217 format ('EUR','USD'). If the currency doesn't implemented yet, return an error unknown_currency
 //
 // Raises
 //
